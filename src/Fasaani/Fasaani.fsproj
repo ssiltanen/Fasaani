@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <DebugType>portable</DebugType>
+    <PackageIconUrl>https://github.com/ssiltanen/Fasaani/raw/master/Logo.png</PackageIconUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Fasaani.fs" />
+    <Compile Include="FilterBuilder.fs" />
+    <Compile Include="SearchBuilder.fs" />
+    <Compile Include="Search.fs" />
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>
