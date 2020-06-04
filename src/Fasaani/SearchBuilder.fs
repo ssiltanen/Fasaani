@@ -16,10 +16,28 @@ type SearchBuilder () =
     member _.SearchText(state: SearchDetails, text) =
         { state with Text = Some text }
 
+    /// Sets the query search mode to set whether any or all of the search terms must be matched
+    [<CustomOperation"searchMode">]
+    member _.SearchMode(state: SearchDetails, mode : Fasaani.SearchTermMatchMode) =
+        state.Parameters.SearchMode <- mode.SearchMode
+        state
+
+    /// Sets the query syntax to simple or full aka lucene
+    [<CustomOperation"querySyntax">]
+    member _.QuerySyntax(state: SearchDetails, queryType : Fasaani.QuerySyntax) =
+        state.Parameters.QueryType <- queryType.QueryType
+        state
+
     /// Sets the search filter
     [<CustomOperation"filter">]
     member _.Filter(state: SearchDetails, filter: Filter) =
-        state.Parameters.Filter <- evaluate filter |> Option.toObj
+        state.Parameters.Filter <- Filter.evaluate filter |> Option.toObj
+        state
+
+    /// Sets the search fields that query is matched against. If none are provided, query matches against all fields
+    [<CustomOperation"searchFields">]
+    member _.SearchFields(state: SearchDetails, fields : string seq) =
+        state.Parameters.SearchFields <- ResizeArray fields
         state
 
     /// Sets the search facets
@@ -38,6 +56,12 @@ type SearchBuilder () =
     [<CustomOperation"top">]
     member _.Top(state: SearchDetails, count: int) =
         state.Parameters.Top <- Nullable count
+        state
+
+    /// Sets the search order by values
+    [<CustomOperation"orderBy">]
+    member _.OrderBy(state: SearchDetails, orderBy: OrderBy seq) =
+        state.Parameters.OrderBy <- orderBy |> Seq.map OrderBy.evaluate |> ResizeArray
         state
 
     /// Sets query to return the total found results count

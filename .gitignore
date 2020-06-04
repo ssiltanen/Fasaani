@@ -3,3 +3,5 @@
 bin/
 obj/
 paket-files/
+azuredeploysettings.json
+farmer-deploy.json

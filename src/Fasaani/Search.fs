@@ -1,16 +1,23 @@
 [<AutoOpen>]
 module Fasaani.Search
 
+open System
 open System.Threading
 open FSharp.Control.Tasks.V2.ContextInsensitive
 open Microsoft.Azure.Search
 
-let searchAsync<'T when 'T: not struct> (client: ISearchIndexClient) (config: SearchConfig option) (details: SearchDetails) =
+let internal recordFields (t: Type) =
+    Reflection.FSharpType.GetRecordFields t
+    |> Array.map (fun x -> x.Name)
+
+let internal search<'T when 'T: not struct> (client: ISearchIndexClient) (config: SearchConfig option) (details: SearchDetails) =
     config
     |> Option.bind (fun c -> c.Log)
     |> Option.iter (fun log -> log details.Text details.Parameters details.RequestOptions)
 
     task {
+        // Return only fields used in the return record type
+        details.Parameters.Select <- recordFields (typeof<'T>)
         let! searchResult =
             client.Documents.SearchAsync<'T>(
                 details.Text |> Option.toObj,
@@ -34,3 +41,9 @@ let searchAsync<'T when 'T: not struct> (client: ISearchIndexClient) (config: Se
               Count = count
               Raw = searchResult }
     }
+
+let searchWithConfigAsync<'T when 'T: not struct> (client: ISearchIndexClient) (config: SearchConfig) (details: SearchDetails) =
+    search client (Some config) details
+
+let searchAsync<'T when 'T: not struct> (client: ISearchIndexClient) (details: SearchDetails) =
+    search client None details

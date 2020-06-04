@@ -1,7 +1,7 @@
 # Fasaani
 
 <p align="center">
-<img src="https://github.com/ssiltanen/Fasaani/raw/master/Logo.png" width="150px"/>
+<img src="https://github.com/ssiltanen/Fasaani/raw/master/Logo.png" width="200px"/>
 </p>
 
 Fasaani is a simple F# wrapper on top of Azure Search .NET SDK. This library does not try to cover all functionality of the wrapped SDK, but instead cover the most common use cases of querying Azure Search indexes.
@@ -25,7 +25,7 @@ After creating the client define a basic text search query with Fasaani `search`
 ```fsharp
 search {
     searchText "text used to search"
-} |> searchAsync<MyModel> indexClient None
+} |> searchAsync<MyModel> indexClient
 
 // Returns
 // type SearchResult<'T> =
@@ -94,40 +94,113 @@ let filterExpr =
 
 search {
     filter filterExpr
-} |> searchAsync<MyModel> indexClient None
+} |> searchAsync<MyModel> indexClient
 
 // Or with some text search
 search {
     searchText "Some text to search with"
     filter filterExpr
-} |> searchAsync<MyModel> indexClient None
+} |> searchAsync<MyModel> indexClient
 ```
 
-### Paging
+### Paging and order by
 
-Azure search incorporates a default skip and top values. Currently skip = 0 and top 50. These values can be overwritten with Fasaani with `skip`, and `top` operators. By default Azure Search does not calculate the total count of found documents for the search, and it needs to be specified explicitly with `includeTotalResultCount` operator:
+Azure search incorporates a default skip and top values. Currently skip = 0 and top 50. These values can be overwritten with Fasaani with `skip`, and `top` operators.
+
+Order by fields are specified with a collection of either field based order, distance based order or search score based order.
+
+By default Azure Search does not calculate the total count of found documents for the search, and it needs to be specified explicitly with `includeTotalResultCount` operator:
 
 ```fsharp
 search {
     searchText "Search text"
     skip 0
     top 100
+    orderBy [ byField "field1" Asc; byDistance "field2" -122.131577M 47.678581M Desc; bySearchScore Desc ]
     includeTotalResultCount
-} |> searchAsync<MyModel> indexClient None
+} |> searchAsync<MyModel> indexClient
 ```
 
 ### Facets
+
+Specify collection of facets to return them in the response
 
 ```fsharp
 search {
     searchText "Search text"
     facets [ "Facet1"; "Facet2" ] // Response Facets are empty unless these are provided
-} |> searchAsync<MyModel> indexClient None
+} |> searchAsync<MyModel> indexClient
+```
+
+### Search mode
+
+To specify whether any or all of the search terms must match in order to count the document as a match. Possible values include: Any, All
+
+```fsharp
+search {
+    searchText "Search text"
+    searchMode All
+} |> searchAsync<MyModel> indexClient
+```
+
+### Search query syntax aka query mode
+
+To specify query mode i.e. the syntax used in the query, provide querySyntax value of possible values Simple, Lucene.
+
+```fsharp
+search {
+    searchText "Search text"
+    querySyntax Lucene
+} |> searchAsync<MyModel> indexClient
+```
+
+### Select
+
+Azure Search .NET SDK allows setting select fields aka fields that are returned of found documents. Using this parameter is not necessary in Fasaani, as Fasaani uses reflection on the type parameter provided and sets them as query select field values.
+
+### Search fields
+
+To limit which fields Azure Search uses for text search, provide search fields in a collection. When no search fields are specified, all document fields are searched.
+
+```fsharp
+search {
+    searchText "Search text"
+    searchFields [ "field1"; "field2" ]
+} |> searchAsync<MyModel> indexClient
+```
+
+### Special constants
+
+Fasaani includes some constants used in OData: NaN, Infinite, NegativeInfinite.
+
+These can be used in filters:
+
+```fsharp
+let filter =
+    [ where "field1" Lt Infinite
+      where "field2" Gt NegativeInfinite
+      where "field3" Ne NaN ]
+```
+
+### Geo functions
+
+Fasaani supports OData geo functions geo.distance and geo.intersect with functions `whereDIstance` and `whereIntersects`. They can be used together with `where` function or alone as a filter
+
+```fsharp
+let distanceFilter = whereDistance "field" (Lat -122.131577M, Lon 47.678581M) Lt 1
+
+let intersectFilter =
+    whereIntersects 
+        "field" 
+        (Lat -122.031577M, Lon 47.578581M)
+        (Lat -122.031577M, Lon 47.678581M)
+        (Lat -122.131577, Lon 47.678581M)
+        (Lat -122.031577M, Lon 47.578581M)
 ```
 
 ### Query configuration
 
-So far in each example we have given None parameter for the `searchAsync` function. This parameter is a configuration record to alter how the function operates. Currently there is support for logging and cancellation token. 
+So far in each example we have the `searchAsync` function. This function is the non configurable version of `SearchWithConfigAsync`, which can be configured to logger function and/or cancellation token.
 
 Logging with config record works by creating a record of `SearchConfig` with `Log` value. This field is a function that is called before query execution if it is provided. For now it is user's responsibility to provide the implementation for that function in a form that pleases them.
 
@@ -150,7 +223,7 @@ let configWithLogging =
 search {
     searchText "Search text"
     filter (where "MyField" Eq "Bear")
-} |> searchAsync<MyModel> indexClient (Some configWithLogging)
+} |> searchWithConfigAsync<MyModel> indexClient configWithLogging
 ```
 
 ## Help! Fasaani does not support my use case
@@ -166,7 +239,7 @@ search {
     searchText "Search text"
     parameters customParameters
     requestOptions customRequestOptions
-} |> searchAsync<MyModel> indexClient None
+} |> searchAsync<MyModel> indexClient
 ```
 
 In addition, the raw `DocumentSearchResult<'T>` object from underlying method is also returned as `Raw` in the response body.

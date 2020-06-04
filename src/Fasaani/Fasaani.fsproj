@@ -8,7 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Fasaani.fs" />
-    <Compile Include="FilterBuilder.fs" />
+    <Compile Include="Evaluate.fs" />
     <Compile Include="SearchBuilder.fs" />
     <Compile Include="Search.fs" />
   </ItemGroup>

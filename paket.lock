@@ -1,7 +1,7 @@
 STORAGE: NONE
 NUGET
   remote: https://api.nuget.org/v3/index.json
-    FSharp.Core (4.7.1)
+    FSharp.Core (4.7.2)
     Microsoft.Azure.Search (10.1)
       Microsoft.Azure.Search.Data (>= 10.1) - restriction: || (&& (>= net452) (< netstandard1.4)) (&& (< net452) (>= netstandard1.4) (< netstandard2.0)) (&& (< net452) (>= netstandard2.0)) (>= net461)
       Microsoft.Azure.Search.Service (>= 10.1) - restriction: || (&& (>= net452) (< netstandard1.4)) (&& (< net452) (>= netstandard1.4) (< netstandard2.0)) (&& (< net452) (>= netstandard2.0)) (>= net461)
