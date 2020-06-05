@@ -14,21 +14,22 @@ For now, this library is still in its early stages, and its not ready for real u
 
 ```fsharp
 query {
-    searchText "text used to search"    // text searched from index
+    searchText "text used to search"    // Text searched from index
     searchFields [ "SomeField" ]        // Which fields are matched with text search
-    searchMode All                      // whether any or all of the search terms must be matched. All or Any
-    querySyntax Simple                  // configure query to use simple syntax or Lucene syntax. Simple or Lucene
-    facets [ "facet1"; "facet2" ]       // Facets to return
-    filter (where "field" Eq 1)         // Query filter, see more below
+    searchMode All                      // Whether any or all of the search terms must be matched. All or Any
+    querySyntax Simple                  // Configure query to use simple syntax or Lucene syntax. Simple or Lucene
+    facets [ "facet1"; "facet2" ]       // Facets to return, see facets
+    filter (where "field" Eq 1)         // Query filter, see filtering
     skip 10                             // Skip count of results, see paging
     top 25                              // How many results are returned, see paging
-    includeTotalResultCount             // Return total matched results count
-    requestOptions opt                  // Raw request options of underlying SDK
-    //parameters par                    // Raw parameters of underlying SDK. Overwrites above other settings!
+    order [ byField "field1" Asc ]      // Order of returned results, see paging
+    includeTotalResultCount             // Return total matched results count, see paging
+    requestOptions opt                  // Raw request options of underlying SDK, see Help! section
+    //parameters par                    // Raw parameters of underlying SDK. Overwrites above other settings! See Help! section
 } |> searchAsync<MyModel> indexClient
 ```
 
-All above settings are optional so use only the ones you need in your query. More info of each can be found below. The parameters setting is commented out in the example to emphasize that it should not be used together with other settings as they overwrite each other if used in the same query.
+All above settings are optional so use only the ones you need in your query. More info of each can be found below. The parameters setting is commented out in the example to emphasize that it should not be used together with other settings as they overwrite each other if used in the same query. Extra mention also to Select parameter that sets the returned fields from result documents in the underlying library which is implicitly implemented in Fasaani from the output model properties.
 
 ## How to use
 
