@@ -25,12 +25,12 @@ search {
     skip 10                             // Skip count of results, see paging
     top 25                              // How many results are returned, see paging
     includeTotalResultCount             // Return total matched results count
+    requestOptions opt                  // Raw request options of underlying SDK
     //parameters par                    // Raw parameters of underlying SDK. Overwrites above other settings!
-    //requestOptions opt                // Raw request options of underlying SDK
 } |> searchAsync<MyModel> indexClient
 ```
 
-All above settings are optional so use only the ones you need in your query. More info of each can be found below.
+All above settings are optional so use only the ones you need in your query. More info of each can be found below. The parameters setting is commented out in the example to emphasize that it should not be used together with other settings as they overwrite each other if used in the same query.
 
 ### Basic query
 
