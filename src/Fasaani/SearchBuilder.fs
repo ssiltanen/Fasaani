@@ -59,8 +59,8 @@ type SearchBuilder () =
         state
 
     /// Sets the search order by values
-    [<CustomOperation"orderBy">]
-    member _.OrderBy(state: SearchDetails, orderBy: OrderBy seq) =
+    [<CustomOperation"order">]
+    member _.Order(state: SearchDetails, orderBy: OrderBy seq) =
         state.Parameters.OrderBy <- orderBy |> Seq.map OrderBy.evaluate |> ResizeArray
         state
 

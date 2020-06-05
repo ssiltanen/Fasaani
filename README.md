@@ -4,13 +4,33 @@
 <img src="https://github.com/ssiltanen/Fasaani/raw/master/Logo.png" width="200px"/>
 </p>
 
-Fasaani is a simple F# wrapper on top of Azure Search .NET SDK. This library does not try to cover all functionality of the wrapped SDK, but instead cover the most common use cases of querying Azure Search indexes.
+Fasaani is a simple F# wrapper on top of Azure Search .NET SDK. This library does not try to cover all functionality of the wrapped SDK, but instead it covers some common use cases of querying Azure Search indexes.
 
 ## Installation
 
 For now, this library is still in its early stages, and its not ready for real usage. Therefore, no installation guides yet.
 
 ## How to use
+
+### All settings in one
+
+```fsharp
+search {
+    searchText "text used to search"    // text searched from index
+    searchFields [ "SomeField" ]        // Which fields are matched with text search
+    searchMode All                      // whether any or all of the search terms must be matched. All or Any
+    querySyntax Simple                  // configure query to use simple syntax or Lucene syntax. Simple or Lucene
+    facets [ "facet1"; "facet2" ]       // Facets to return
+    filter (where "field" Eq 1)         // Query filter, see more below
+    skip 10                             // Skip count of results, see paging
+    top 25                              // How many results are returned, see paging
+    includeTotalResultCount             // Return total matched results count
+    //parameters par                    // Raw parameters of underlying SDK. Overwrites above other settings!
+    //requestOptions opt                // Raw request options of underlying SDK
+} |> searchAsync<MyModel> indexClient
+```
+
+All above settings are optional so use only the ones you need in your query. More info of each can be found below.
 
 ### Basic query
 
@@ -20,7 +40,7 @@ First create SearchIndexClient like you normally would. Notice that you should u
 use indexClient = new SearchIndexClient (searchName, indexName, SearchCredentials(searchQueryKey)) :> ISearchIndexClient
 ```
 
-After creating the client define a basic text search query with Fasaani `search` computational expression, and pipe it to `searchAsync` expression to execute your query:
+After creating the client, define a basic text search query with Fasaani `search` computational expression, and pipe it to `searchAsync` expression to execute your query:
 
 ```fsharp
 search {
@@ -103,6 +123,22 @@ search {
 } |> searchAsync<MyModel> indexClient
 ```
 
+#### Geo functions
+
+Fasaani supports filtering with OData geo functions geo.distance and geo.intersect with functions `whereDIstance` and `whereIntersects`. They can be used together with `where` function or alone as a filter
+
+```fsharp
+let distanceFilter = whereDistance "field" (Lat -122.131577M, Lon 47.678581M) Lt 1
+
+let intersectFilter =
+    whereIntersects 
+        "field" 
+        (Lat -122.031577M, Lon 47.578581M)
+        (Lat -122.031577M, Lon 47.678581M)
+        (Lat -122.131577M, Lon 47.678581M)
+        (Lat -122.031577M, Lon 47.578581M)
+```
+
 ### Paging and order by
 
 Azure search incorporates a default skip and top values. Currently skip = 0 and top 50. These values can be overwritten with Fasaani with `skip`, and `top` operators.
@@ -116,7 +152,7 @@ search {
     searchText "Search text"
     skip 0
     top 100
-    orderBy [ byField "field1" Asc; byDistance "field2" -122.131577M 47.678581M Desc; bySearchScore Desc ]
+    order [ byField "field1" Asc; byDistance "field2" -122.131577M 47.678581M Desc; bySearchScore Desc ]
     includeTotalResultCount
 } |> searchAsync<MyModel> indexClient
 ```
@@ -180,22 +216,6 @@ let filter =
     [ where "field1" Lt Infinite
       where "field2" Gt NegativeInfinite
       where "field3" Ne NaN ]
-```
-
-### Geo functions
-
-Fasaani supports OData geo functions geo.distance and geo.intersect with functions `whereDIstance` and `whereIntersects`. They can be used together with `where` function or alone as a filter
-
-```fsharp
-let distanceFilter = whereDistance "field" (Lat -122.131577M, Lon 47.678581M) Lt 1
-
-let intersectFilter =
-    whereIntersects 
-        "field" 
-        (Lat -122.031577M, Lon 47.578581M)
-        (Lat -122.031577M, Lon 47.678581M)
-        (Lat -122.131577, Lon 47.678581M)
-        (Lat -122.031577M, Lon 47.578581M)
 ```
 
 ### Query configuration
