@@ -152,7 +152,7 @@ query {
     searchText "Search text"
     skip 0
     top 100
-    order [ byField "field1" Asc; byDistance "field2" -122.131577M 47.678581M Desc; bySearchScore Desc ]
+    order [ byField "field1" Asc; byDistance "field2" (Lat -122.131577M, Lon 47.678581M) Desc; bySearchScore Desc ]
     includeTotalResultCount
 } |> searchAsync<MyModel> indexClient
 ```
