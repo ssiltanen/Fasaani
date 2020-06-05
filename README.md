@@ -10,9 +10,7 @@ Fasaani is a simple F# wrapper on top of Azure Search .NET SDK. This library doe
 
 For now, this library is still in its early stages, and its not ready for real usage. Therefore, no installation guides yet.
 
-## How to use
-
-### All settings in one
+## Overview of supported settings
 
 ```fsharp
 search {
@@ -31,6 +29,8 @@ search {
 ```
 
 All above settings are optional so use only the ones you need in your query. More info of each can be found below. The parameters setting is commented out in the example to emphasize that it should not be used together with other settings as they overwrite each other if used in the same query.
+
+## How to use
 
 ### Basic query
 
@@ -266,6 +266,6 @@ In addition, the raw `DocumentSearchResult<'T>` object from underlying method is
 
 ## TODO
 
-Tests
-OrderBy
-Other querying features and helpers
+- Tests
+- Index/Indexer creation
+- More querying features
