@@ -13,7 +13,7 @@ For now, this library is still in its early stages, and its not ready for real u
 ## Overview of supported settings
 
 ```fsharp
-search {
+query {
     searchText "text used to search"    // text searched from index
     searchFields [ "SomeField" ]        // Which fields are matched with text search
     searchMode All                      // whether any or all of the search terms must be matched. All or Any
@@ -43,7 +43,7 @@ use indexClient = new SearchIndexClient (searchName, indexName, SearchCredential
 After creating the client, define a basic text search query with Fasaani `search` computational expression, and pipe it to `searchAsync` expression to execute your query:
 
 ```fsharp
-search {
+query {
     searchText "text used to search"
 } |> searchAsync<MyModel> indexClient
 
@@ -112,12 +112,12 @@ let filterExpr =
       where "NumericField" Gt 5 ]
     |> List.fold (+) Filter.Empty
 
-search {
+query {
     filter filterExpr
 } |> searchAsync<MyModel> indexClient
 
 // Or with some text search
-search {
+query {
     searchText "Some text to search with"
     filter filterExpr
 } |> searchAsync<MyModel> indexClient
@@ -148,7 +148,7 @@ Order by fields are specified with a collection of either field based order, dis
 By default Azure Search does not calculate the total count of found documents for the search, and it needs to be specified explicitly with `includeTotalResultCount` operator:
 
 ```fsharp
-search {
+query {
     searchText "Search text"
     skip 0
     top 100
@@ -162,7 +162,7 @@ search {
 Specify collection of facets to return them in the response
 
 ```fsharp
-search {
+query {
     searchText "Search text"
     facets [ "Facet1"; "Facet2" ] // Response Facets are empty unless these are provided
 } |> searchAsync<MyModel> indexClient
@@ -173,7 +173,7 @@ search {
 To specify whether any or all of the search terms must match in order to count the document as a match. Possible values include: Any, All
 
 ```fsharp
-search {
+query {
     searchText "Search text"
     searchMode All
 } |> searchAsync<MyModel> indexClient
@@ -184,7 +184,7 @@ search {
 To specify query mode i.e. the syntax used in the query, provide querySyntax value of possible values Simple, Lucene.
 
 ```fsharp
-search {
+query {
     searchText "Search text"
     querySyntax Lucene
 } |> searchAsync<MyModel> indexClient
@@ -199,7 +199,7 @@ Azure Search .NET SDK allows setting select fields aka fields that are returned 
 To limit which fields Azure Search uses for text search, provide search fields in a collection. When no search fields are specified, all document fields are searched.
 
 ```fsharp
-search {
+query {
     searchText "Search text"
     searchFields [ "field1"; "field2" ]
 } |> searchAsync<MyModel> indexClient
@@ -240,7 +240,7 @@ let configWithLogging =
             parameters.Filter |> Option.ofObj |> Option.iter log.LogInformation
       CancellationToken = None }
 
-search {
+query {
     searchText "Search text"
     filter (where "MyField" Eq "Bear")
 } |> searchWithConfigAsync<MyModel> indexClient configWithLogging
@@ -255,7 +255,7 @@ let customParameters = SearchParameters()
 customParameters.Top <- Nullable 100
 let customRequestOptions = SearchRequestOptions()
 
-search {
+query {
     searchText "Search text"
     parameters customParameters
     requestOptions customRequestOptions

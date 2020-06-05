@@ -9,7 +9,7 @@
   <ItemGroup>
     <Compile Include="Fasaani.fs" />
     <Compile Include="Evaluate.fs" />
-    <Compile Include="SearchBuilder.fs" />
+    <Compile Include="QueryBuilder.fs" />
     <Compile Include="Search.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

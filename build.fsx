@@ -19,9 +19,10 @@ open Newtonsoft.Json.Linq
 
 Target.initEnvironment ()
 
-let deployConfig = "deploysettings.json" |> System.IO.File.ReadAllText |> JObject.Parse
-let subscriptionIdOrName = string deployConfig.["subscriptionIdOrName"]
-let resourceGroup = string deployConfig.["resourceGroup"]
+// Functions to not need config file to exist in order to run any fake target
+let deployConfig () = "azuredeploysettings.json" |> System.IO.File.ReadAllText |> JObject.Parse
+let subscriptionIdOrName () = deployConfig () |> fun conf -> string conf.["subscriptionIdOrName"]
+let resourceGroup () = deployConfig () |> fun conf -> string conf.["resourceGroup"]
 
 let projectPath = "src" </> "Fasaani"
 
@@ -46,7 +47,7 @@ let deployTestInfra () =
     // as az login just takes the first one from returned subscriptions
     // and because Farmer only runs only az login at the background
     let setSub () =
-        Deploy.Az.setSubscription subscriptionIdOrName |> Result.map ignore
+        subscriptionIdOrName () |> Deploy.Az.setSubscription |> Result.map ignore
     let loginResult =
         if Deploy.Az.isLoggedIn ()
         then setSub ()
@@ -54,8 +55,9 @@ let deployTestInfra () =
 
     match loginResult with
     | Ok _ ->
+        let rg = resourceGroup ()
         template
-        |> Deploy.execute resourceGroup Deploy.NoParameters
+        |> Deploy.execute rg Deploy.NoParameters
         |> Seq.iter (fun pair -> printfn "%s: %s" pair.Key pair.Value) // TODO: Instead of printing, write these to a file that tests could use se we avoid copy paste and such
     | Error msg ->
         failwith msg

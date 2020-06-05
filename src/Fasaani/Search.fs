@@ -10,7 +10,7 @@ let internal recordFields (t: Type) =
     Reflection.FSharpType.GetRecordFields t
     |> Array.map (fun x -> x.Name)
 
-let internal search<'T when 'T: not struct> (client: ISearchIndexClient) (config: SearchConfig option) (details: SearchDetails) =
+let internal search<'T when 'T: not struct> (client: ISearchIndexClient) (config: SearchConfig option) (details: QueryDetails) =
     config
     |> Option.bind (fun c -> c.Log)
     |> Option.iter (fun log -> log details.Text details.Parameters details.RequestOptions)
@@ -42,8 +42,8 @@ let internal search<'T when 'T: not struct> (client: ISearchIndexClient) (config
               Raw = searchResult }
     }
 
-let searchWithConfigAsync<'T when 'T: not struct> (client: ISearchIndexClient) (config: SearchConfig) (details: SearchDetails) =
-    search client (Some config) details
+let searchWithConfigAsync<'T when 'T: not struct> (client: ISearchIndexClient) (config: SearchConfig) (details: QueryDetails) =
+    search<'T> client (Some config) details
 
-let searchAsync<'T when 'T: not struct> (client: ISearchIndexClient) (details: SearchDetails) =
-    search client None details
+let searchAsync<'T when 'T: not struct> (client: ISearchIndexClient) (details: QueryDetails) =
+    search<'T> client None details

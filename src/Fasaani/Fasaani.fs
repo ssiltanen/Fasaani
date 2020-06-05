@@ -76,7 +76,7 @@ type Filter =
     static member (*) (a,b) = Binary (a, Or, b)
     static member (!) a = Not a
 
-type SearchDetails =
+type QueryDetails =
     { Text: string option
       Parameters: SearchParameters
       RequestOptions: SearchRequestOptions option }
