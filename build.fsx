@@ -77,6 +77,7 @@ let pushNuget project =
     let setNugetPushParams (defaults: NuGet.NuGetPushParams) =
         { defaults with
             DisableBuffering = true
+            Source = Some "https://api.nuget.org/v3/index.json"
             ApiKey = Some apiKey }
     project |> DotNet.nugetPush (fun defaults -> { defaults with PushParams = setNugetPushParams defaults.PushParams })
 
