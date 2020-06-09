@@ -23,6 +23,9 @@ Target.initEnvironment ()
 let deployConfig () = "azuredeploysettings.json" |> System.IO.File.ReadAllText |> JObject.Parse
 let subscriptionIdOrName () = deployConfig () |> fun conf -> string conf.["subscriptionIdOrName"]
 let resourceGroup () = deployConfig () |> fun conf -> string conf.["resourceGroup"]
+let nugetKeyEnvVariableName = "NUGET_KEY"
+let nugetKey = Environment.environVarOrNone nugetKeyEnvVariableName
+
 
 let projectPath = "src" </> "Fasaani"
 
@@ -68,9 +71,9 @@ let createNuget project =
 
 let pushNuget project =
     let apiKey =
-        match Environment.environVarOrNone "NUGET_KEY" with
-        | Some nugetKey -> nugetKey
-        | None -> failwith "The NuGet API key must be set in a NUGET_KEY environmental variable"
+        match nugetKey with
+        | Some key -> key
+        | None -> failwithf "The NuGet API key must be set in a %s environmental variable" nugetKeyEnvVariableName
     let setNugetPushParams (defaults: NuGet.NuGetPushParams) =
         { defaults with
             DisableBuffering = true

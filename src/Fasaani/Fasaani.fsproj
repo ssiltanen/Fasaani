@@ -3,8 +3,16 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <DebugType>portable</DebugType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageId>Fasaani</PackageId>
+    <Description> Thin F# wrapper for Azure Search .NET SDK </Description>
+    <RepositoryUrl>https://github.com/ssiltanen/Fasaani</RepositoryUrl>
+    <PackageLicenseUrl>https://github.com/ssiltanen/Fasaani/blob/master/LICENSE</PackageLicenseUrl>
     <PackageIconUrl>https://github.com/ssiltanen/Fasaani/raw/master/Logo.png</PackageIconUrl>
+    <PackageTags>fsharp;azure;search</PackageTags>
+    <Authors>Sampo Siltanen</Authors>
+    <Version>0.1.0-beta</Version>
+    <PackageReleaseNotes>Query wrapper preview</PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Fasaani.fs" />
