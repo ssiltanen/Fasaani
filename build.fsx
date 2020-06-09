@@ -76,10 +76,13 @@ let pushNuget project =
         | None -> failwithf "The NuGet API key must be set in a %s environmental variable" nugetKeyEnvVariableName
     let setNugetPushParams (defaults: NuGet.NuGetPushParams) =
         { defaults with
-            DisableBuffering = true
             Source = Some "https://api.nuget.org/v3/index.json"
             ApiKey = Some apiKey }
-    project |> DotNet.nugetPush (fun defaults -> { defaults with PushParams = setNugetPushParams defaults.PushParams })
+    let nupkgFolder = project </> "bin" </> "Release"
+
+    nupkgFolder </> (Directory.findFirstMatchingFile "Fasaani.*.nupkg" nupkgFolder)
+    |> Path.getFullName
+    |> DotNet.nugetPush (fun defaults -> { defaults with PushParams = setNugetPushParams defaults.PushParams })
 
 Target.create "Clean"           (fun _ -> cleanAll())
 Target.create "DeployTestInfra" (fun _ -> deployTestInfra ())
