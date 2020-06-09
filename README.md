@@ -104,6 +104,14 @@ If you want more freedom over how these are combined you can also combine them b
 (where "MyField" Eq "Value") + (where "AnotherField" Eq "AnotherValue")
 ```
 
+It is also possible to create a filter for OData `search.in` function with helpers `whereIsIn` and `whereIsInDelimited`:
+
+```fsharp
+[ whereIsIn "MyField" [ "Value1"; "Value2" ]
+  whereIsInDelimited "AnotherField" [ "Value with spaces and ,"; "Another value" ] '|' ] // Just an example character as pipe
+|> combineWithAnd
+```
+
 After forming the filter, provide it to the search CE:
 
 ```fsharp

@@ -66,7 +66,9 @@ type QuerySyntax =
 
 type Filter =
     | Empty
-    | Field of field:string * ComparisonOperation * value:obj
+    | Comparison of field:string * ComparisonOperation * value:obj
+    | IsIn of field:string * values:string seq
+    | IsInDelimited of field:string * values:string seq * delimiter:char
     | GeoDistance of field:string * Coordinate * ComparisonOperation * value:obj
     | GeoIntersect of field:string * Polygon
     | OData of filter:string

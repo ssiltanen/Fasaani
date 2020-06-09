@@ -4,7 +4,13 @@ module Fasaani.Evaluate
 /// Filter helpers
 
 let where field comparison value =
-    Field (field, comparison, value)
+    Comparison (field, comparison, value)
+
+let whereIsIn field values =
+    IsIn (field, values)
+
+let whereIsInDelimited field values delimiter =
+    IsInDelimited (field, values, delimiter)
 
 let isNot filter =
     Not filter
@@ -53,12 +59,32 @@ module Filter =
     let evaluate filter =
         let rec eval = function
             | Empty -> None
-            | Field (field, comparison, value) ->
+            | Comparison (field, comparison, value) ->
                 match value with
                 | null -> sprintf "%s %s null" field comparison.LowerCaseValue
                 | :? string as str -> sprintf "%s %s '%s'" field comparison.LowerCaseValue str
                 | value -> sprintf "%s %s %O" field comparison.LowerCaseValue value
                 |> Some
+            | IsIn (field, values) ->
+                let values = Seq.toList values
+                match values with
+                | [] -> failwith "No values provided to IsIn operation"
+                | _ ->
+                    values
+                    |> Seq.map (fun str -> if isNull str then "null" else str)
+                    |> String.concat ", "
+                    |> sprintf "search.in(%s, '%s')" field
+                    |> Some
+            | IsInDelimited (field, values, delimiter) ->
+                let values = Seq.toList values
+                match values with
+                | [] -> failwith "No values provided to IsIn operation"
+                | _ ->
+                    values
+                    |> Seq.map (fun str -> if isNull str then "null" else str)
+                    |> String.concat (string delimiter)
+                    |> fun str -> sprintf "search.in(%s, '%s', '%c')" field str delimiter
+                    |> Some
             | GeoDistance (field, coordinate, comparison, value) ->
                 let distanceOData = OData.geoDistance field coordinate
                 sprintf "%s %s %O" distanceOData comparison.LowerCaseValue value
