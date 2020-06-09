@@ -11,8 +11,8 @@
     <PackageIcon>Logo.png</PackageIcon>
     <PackageTags>fsharp;azure;search</PackageTags>
     <Authors>Sampo Siltanen</Authors>
-    <Version>0.1.0-beta</Version>
-    <PackageReleaseNotes>Query wrapper preview</PackageReleaseNotes>
+    <Version>0.1.1-beta</Version>
+    <PackageReleaseNotes>Support for OData search.in function</PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Fasaani.fs" />
