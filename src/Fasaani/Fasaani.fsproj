@@ -24,9 +24,9 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/ssiltanen/Fasaani</RepositoryUrl>
 
-    <!-- SourceLink settings -->
+    <!-- SourceLink settings 
     <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat> -->
 
   </PropertyGroup>
   

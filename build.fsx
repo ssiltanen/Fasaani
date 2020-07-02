@@ -76,6 +76,9 @@ let deployTestInfra () =
     | Error msg ->
         failwith msg
 
+let build project =
+    DotNet.build (fun defaults -> { defaults with Configuration = DotNet.BuildConfiguration.Release }) project
+
 let createNuget project =
     project |> DotNet.restore (fun defaults -> { defaults with NoCache = true })
     project |> DotNet.pack (fun defaults -> { defaults with Configuration = DotNet.BuildConfiguration.Release })
@@ -97,8 +100,8 @@ let pushNuget project =
 
 Target.create "Clean"           (fun _ -> cleanAll())
 Target.create "DeployTestInfra" (fun _ -> deployTestInfra ())
-Target.create "Build"           (fun _ -> DotNet.build id projectPath)
-Target.create "BuildTests"      (fun _ -> DotNet.build id testProjectPath)
+Target.create "Build"           (fun _ -> build projectPath)
+Target.create "BuildTests"      (fun _ -> build testProjectPath)
 Target.create "RunTests"        (fun _ -> Expecto.run id [ testAssembly ])
 Target.create "Test"            ignore
 Target.create "Pack"            (fun _ -> createNuget projectPath)
