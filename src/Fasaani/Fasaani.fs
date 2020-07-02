@@ -7,17 +7,12 @@ type Lat = Lat of decimal
 type Lon = Lon of decimal
 type Coordinate = Lat * Lon
 type Polygon = Coordinate * Coordinate * Coordinate * Coordinate
-type NaN = NaN
-type Infinite = Infinite override _.ToString() = "INF"
-type NegativeInfinite = NegativeInfinite override _.ToString() = "-INF"
 
 type BinaryOperation =
     | And
     | Or
     member this.LowerCaseValue =
-        match this with
-        | And -> "and"
-        | Or -> "or"
+        this.ToString().ToLowerInvariant()
 
 type ComparisonOperation =
     | Eq
@@ -27,21 +22,13 @@ type ComparisonOperation =
     | Ge
     | Le
     member this.LowerCaseValue =
-        match this with
-        | Eq -> "eq"
-        | Ne -> "ne"
-        | Gt -> "gt"
-        | Lt -> "lt"
-        | Ge -> "ge"
-        | Le -> "le"
+        this.ToString().ToLowerInvariant()
 
 type Direction =
     | Asc
     | Desc
     member this.LowerCaseValue =
-        match this with
-        | Asc -> "asc"
-        | Desc -> "desc"
+        this.ToString().ToLowerInvariant()
 
 type OrderBy =
     | ByField of field:string * Direction

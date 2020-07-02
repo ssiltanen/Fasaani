@@ -4,3 +4,9 @@ storage: none
 nuget FSharp.Core
 nuget Microsoft.Azure.Search
 nuget TaskBuilder.fs
+
+// Test dependencies
+nuget Expecto
+nuget Expecto.FsCheck
+nuget YoloDev.Expecto.TestSdk
+nuget Microsoft.NET.Test.Sdk

@@ -39,7 +39,7 @@ let bySearchScore direction =
     BySearchScore direction
 
 [<RequireQualifiedAccess>]
-module OData =
+module GeoOData =
 
     let geoDistance (field: string) (coordinate: Coordinate) =
         let (Lat lat, Lon lon) = coordinate
@@ -63,6 +63,9 @@ module Filter =
                 match value with
                 | null -> sprintf "%s %s null" field comparison.LowerCaseValue
                 | :? string as str -> sprintf "%s %s '%s'" field comparison.LowerCaseValue str
+                | :? float as num when num = infinity -> sprintf "%s %s INF" field comparison.LowerCaseValue
+                | :? float as num when num = -infinity -> sprintf "%s %s -INF" field comparison.LowerCaseValue
+                | :? float as num when num = nan -> sprintf "%s %s NaN" field comparison.LowerCaseValue
                 | value -> sprintf "%s %s %O" field comparison.LowerCaseValue value
                 |> Some
             | IsIn (field, values) ->
@@ -86,11 +89,11 @@ module Filter =
                     |> fun str -> sprintf "search.in(%s, '%s', '%c')" field str delimiter
                     |> Some
             | GeoDistance (field, coordinate, comparison, value) ->
-                let distanceOData = OData.geoDistance field coordinate
+                let distanceOData = GeoOData.geoDistance field coordinate
                 sprintf "%s %s %O" distanceOData comparison.LowerCaseValue value
                 |> Some
             | GeoIntersect (field, polygon) ->
-                OData.geoIntersect field polygon |> Some
+                GeoOData.geoIntersect field polygon |> Some
             | OData expr -> Some expr
             | Not filter -> eval filter |> Option.map (sprintf "not (%s)")
             | Binary (filter1, operator, filter2) ->
@@ -108,7 +111,7 @@ module OrderBy =
         | ByField (field, direction) ->
             sprintf "%s %s" field direction.LowerCaseValue
         | ByGeoDistance (field, coordinate, direction) ->
-            let distanceOData = OData.geoDistance field coordinate
+            let distanceOData = GeoOData.geoDistance field coordinate
             sprintf "%s %s" distanceOData direction.LowerCaseValue
         | BySearchScore direction ->
             sprintf "search.score() %s" direction.LowerCaseValue

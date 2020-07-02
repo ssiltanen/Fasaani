@@ -1,0 +1,7 @@
+FSharp.Core
+Microsoft.Azure.Search
+TaskBuilder.fs
+Expecto
+Expecto.FsCheck
+YoloDev.Expecto.TestSdk
+Microsoft.NET.Test.Sdk

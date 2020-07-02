@@ -1,20 +1,35 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Library</OutputType>
+
+    <!-- General -->
+    <AssemblyName>Fasaani</AssemblyName>
+    <Version>0.1.2-beta</Version>
+    <Description>Thin F# wrapper for Azure Search .NET SDK </Description>
+    <Authors>Sampo Siltanen</Authors>
+    
+    <!-- Build settings -->
     <TargetFramework>netstandard2.0</TargetFramework>
+    <DebugType>portable</DebugType>
+    <OutputType>Library</OutputType>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- NuGet Pack settings -->
     <PackageId>Fasaani</PackageId>
-    <Description> Thin F# wrapper for Azure Search .NET SDK </Description>
-    <RepositoryUrl>https://github.com/ssiltanen/Fasaani.git</RepositoryUrl>
-    <RepositoryType>git</RepositoryType> 
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>Logo.png</PackageIcon>
     <PackageTags>fsharp;azure;search</PackageTags>
-    <Authors>Sampo Siltanen</Authors>
-    <Version>0.1.1-beta</Version>
-    <PackageReleaseNotes>Support for OData search.in function</PackageReleaseNotes>
+    <PackageReleaseNotes>https://raw.githubusercontent.com/ssiltanen/Fasaani/master/RELEASE_NOTES.md</PackageReleaseNotes>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/ssiltanen/Fasaani</RepositoryUrl>
+
+    <!-- SourceLink settings -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
   </PropertyGroup>
+  
   <ItemGroup>
     <Compile Include="Fasaani.fs" />
     <Compile Include="Evaluate.fs" />
@@ -23,5 +38,6 @@
     <None Include="..\..\Logo.png" Pack="true" PackagePath="\"/>
     <None Include="..\..\LICENSE" Pack="true" PackagePath="\"/>
   </ItemGroup>
+
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

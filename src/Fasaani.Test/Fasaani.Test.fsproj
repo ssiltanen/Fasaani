@@ -7,14 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Sample.fs" />
+    <ProjectReference Include="..\Fasaani\Fasaani.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Evaluate.fs" />
+    <Compile Include="Search.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Expecto" Version="9.*" />
-    <PackageReference Include="YoloDev.Expecto.TestSdk" Version="0.*" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.*" />
-    <PackageReference Update="FSharp.Core" Version="4.*" />
+    <None Include="azureSearchConfig.json" Condition="Exists('azureSearchConfig.json')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
   </ItemGroup>
+
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

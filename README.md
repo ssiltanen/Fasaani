@@ -216,15 +216,15 @@ query {
 
 ### Special constants
 
-Fasaani includes some constants used in OData: NaN, Infinite, NegativeInfinite.
+Fasaani maps F# float special values (`nan`, `infinity`, `infinity`) to OData counterpars (NaN, INF, -INF)
 
-These can be used in filters:
+These can be used in filters for example:
 
 ```fsharp
 let filter =
-    [ where "field1" Lt Infinite
-      where "field2" Gt NegativeInfinite
-      where "field3" Ne NaN ]
+    [ where "field1" Lt infinity
+      where "field2" Gt -infinity
+      where "field3" Ne nan ]
 ```
 
 ### Query configuration
