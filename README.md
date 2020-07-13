@@ -8,7 +8,11 @@ Fasaani is a simple F# wrapper on top of Azure Search .NET SDK. This library doe
 
 ## Installation
 
-For now, this library is still in its early stages, and its not ready for real usage. Therefore, no installation guides yet.
+Download assembly from Nuget [https://www.nuget.org/packages/Fasaani](https://www.nuget.org/packages/Fasaani) and open namespace Fasaani in your code.
+
+```fsharp
+open Fasaani
+```
 
 ## Overview of supported settings
 
@@ -280,9 +284,3 @@ query {
 ```
 
 In addition, the raw `DocumentSearchResult<'T>` object from underlying method is also returned as `Raw` in the response body.
-
-## TODO
-
-- Tests
-- Index/Indexer creation
-- More querying features

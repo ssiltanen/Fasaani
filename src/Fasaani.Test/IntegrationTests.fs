@@ -16,8 +16,7 @@ type AzureSearchConfig =
 
 [<CLIMutable>]
 type UsersIndex =
-    { [<Key>]
-      [<IsFilterable>]
+    { [<Key; IsFilterable>]
       Id : string
       [<IsFilterable; IsSearchable; IsFacetable; IsSortable>]
       Name : string
@@ -471,6 +470,29 @@ let testsWithSetup setup = [
 
             "Only 5 users should have been returned after limiting results count"
             |> Expect.hasLength searchResults.Results 5
+        )
+    }
+
+    test "Facets in Query returns facets" {
+        setup (fun (client : ISearchIndexClient) insert ->
+            let users = createUsers 10
+            users |> insert |> ignore
+            let searchResults =
+                query {
+                    searchText "*"
+                    facets [ "Name"; "Age" ]
+                } |> searchSyncronously client
+
+            let uniqueNames = users |> List.map (fun u -> u.Name) |> List.distinct |> List.sort
+            let uniqueAges = users |> List.map (fun u -> u.Age) |> List.distinct |> List.sort
+
+            let foundNameFacets = searchResults.Facets.Item "Name" |> Seq.sort
+            let foundAgeFacets = searchResults.Facets.Item "Age" |> Seq.map int |> Seq.sort
+
+            "Name facets should match unique names created"
+            |> Expect.sequenceEqual foundNameFacets uniqueNames
+            "Age facets should match unique ages created"
+            |> Expect.sequenceEqual foundAgeFacets uniqueAges
         )
     }
 
