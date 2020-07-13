@@ -61,7 +61,7 @@ let userIds users = users |> Seq.map userId
 let gpsDistanceFromZero lat lon =
     let lat0 = 0.0
     let lon0 = 0.0
-    let earhRadiusInMeters = 6371e3 // metres
+    let earthRadiusInMeters = 6371e3 // metres
     let fii1 = lat0 * Math.PI / 180.0 // fii, lambda in radians
     let fii2 = lat * Math.PI / 180.0
     let deltaFii = (lat - lat0) * Math.PI / 180.0
@@ -71,7 +71,7 @@ let gpsDistanceFromZero lat lon =
         + Math.Cos(fii1) * Math.Cos(fii2)
         * Math.Sin(deltaLambda / 2.0) * Math.Sin(deltaLambda / 2.0)
     let c = 2.0 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1.0 - a))
-    earhRadiusInMeters * c // in metres
+    earthRadiusInMeters * c // in metres
 
 let testsWithSetup setup = [
 
