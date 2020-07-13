@@ -141,12 +141,20 @@ let distanceFilter = whereDistance "field" (Lat -122.131577M, Lon 47.678581M) Lt
 
 let intersectFilter =
     whereIntersects 
-        "field" 
-        (Lat -122.031577M, Lon 47.578581M)
-        (Lat -122.031577M, Lon 47.678581M)
-        (Lat -122.131577M, Lon 47.678581M)
-        (Lat -122.031577M, Lon 47.578581M)
+        "field"
+        [ Lat -122.031577M, Lon 47.578581M
+          Lat -122.031577M, Lon 47.678581M
+          Lat -122.131577M, Lon 47.678581M
+          Lat -122.031577M, Lon 47.578581M ]
 ```
+
+Notice in the whereIntersects example that Azure Search has rules for the coordinate sequence:
+ 
+- At least 3 unique coordinate points
+- Points in a polygon must be in counterclockwise order
+- The polygon needs to be closed, meaning the first and last point sets must be the same.
+
+For now Fasaani does not provide any automatisation for these, but they are planned for the future.
 
 ### Paging and order by
 

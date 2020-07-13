@@ -68,9 +68,9 @@ let deployTestInfra () =
         template
         |> Deploy.execute rg Deploy.NoParameters
         |> fun outputs -> // Write connection details to a file for tests to use
-            {| name = outputs.["searchName"]
-               adminKey = outputs.["adminKey"]
-               queryKey = outputs.["queryKey"] |}
+            {| SearchName = outputs.["searchName"]
+               AdminKey = outputs.["adminKey"]
+               QueryKey = outputs.["queryKey"] |}
             |> JObject.FromObject
             |> fun jobj -> File.WriteAllText(integrationTestSecretsOutput, jobj.ToString())
     | Error msg ->

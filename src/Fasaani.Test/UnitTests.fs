@@ -1,4 +1,4 @@
-module Fasaani.Test.Evaluate
+module Fasaani.Test.UnitTests
 
 open Expecto
 open Fasaani
@@ -6,11 +6,10 @@ open Fasaani
 let evaluateNoneValueMsg = "Evaluate should evaluate to Some when passing other than Filter.Empty"
 let equalMismatchMsg = "Evaluated filter should match the correct format"
 
-[<Tests>]
 let filter =
     testList "Filter" [
 
-        test "Filter.Empty evaluates to None" {
+        test "Empty evaluates to None" {
             Expect.isNone (Filter.evaluate Filter.Empty) "Evaluating empty filter should return None"
         }
 
@@ -76,17 +75,17 @@ let filter =
         testProperty "whereDistance evaluates to valid OData" <| fun (coordinate: Coordinate, operator: ComparisonOperation, distance: decimal) ->
             let filter = Expect.wantSome (whereDistance "column" coordinate operator distance |> Filter.evaluate) evaluateNoneValueMsg
             let (Lat lat, Lon lon) = coordinate
-            let expected = sprintf "geo.distance(column, geography'POINT(%M %M)') %s %M" lat lon operator.LowerCaseValue distance
+            let expected = sprintf "geo.distance(column, geography'POINT(%M %M)') %s %M" lon lat operator.LowerCaseValue distance
             Expect.equal filter expected equalMismatchMsg
 
         testProperty "whereIntersects evaluates to valid OData" <|
             fun (coord1: Coordinate, coord2: Coordinate, coord3: Coordinate, coord4: Coordinate) ->
-            let filter = Expect.wantSome (whereIntersects "column" coord1 coord2 coord3 coord4 |> Filter.evaluate) evaluateNoneValueMsg
+            let filter = Expect.wantSome (whereIntersects "column" [ coord1; coord2; coord3; coord4 ] |> Filter.evaluate) evaluateNoneValueMsg
             let (Lat lat1, Lon lon1) = coord1
             let (Lat lat2, Lon lon2) = coord2
             let (Lat lat3, Lon lon3) = coord3
             let (Lat lat4, Lon lon4) = coord4
-            let expected = sprintf "geo.intersects(column, geography'POLYGON((%M %M, %M %M, %M %M, %M %M))')" lat1 lon1 lat2 lon2 lat3 lon3 lat4 lon4
+            let expected = sprintf "geo.intersects(column, geography'POLYGON((%M %M, %M %M, %M %M, %M %M))')" lon1 lat1 lon2 lat2 lon3 lat3 lon4 lat4
             Expect.equal filter expected equalMismatchMsg
 
         test "isNot of Filter.Empty evaluates to None" {
@@ -162,7 +161,6 @@ let filter =
 
     ]
 
-[<Tests>]
 let orderBy =
     testList "OrderBy" [
 
@@ -174,7 +172,7 @@ let orderBy =
         testProperty "byDistance evaluates to valid OData" <| fun (coordinate: Coordinate, direction: Direction) ->
             let orderBy = byDistance "column" coordinate direction |> OrderBy.evaluate
             let (Lat lat, Lon lon) = coordinate
-            let expected = sprintf "geo.distance(column, geography'POINT(%M %M)') %s" lat lon direction.LowerCaseValue
+            let expected = sprintf "geo.distance(column, geography'POINT(%M %M)') %s" lon lat direction.LowerCaseValue
             Expect.equal orderBy expected equalMismatchMsg
 
         testProperty "byScore evaluates to valid OData" <| fun (direction: Direction) ->

@@ -24,8 +24,8 @@ let combineWithOr : Filter seq -> Filter =
 let whereDistance field coordinate comparison value =
     GeoDistance (field, coordinate, comparison, value)
 
-let whereIntersects field a b c d =
-    GeoIntersect(field, Polygon (a, b, c, d))
+let whereIntersects field coordinates =
+    GeoIntersect(field, coordinates)
 
 /// Order by helpers
 
@@ -43,15 +43,15 @@ module GeoOData =
 
     let geoDistance (field: string) (coordinate: Coordinate) =
         let (Lat lat, Lon lon) = coordinate
-        sprintf "geo.distance(%s, geography'POINT(%M %M)')" field lat lon
+        sprintf "geo.distance(%s, geography'POINT(%M %M)')" field lon lat
 
     let geoIntersect (field: string) (polygon: Polygon) =
-        let a, b, c, d = polygon
-        let (Lat latA, Lon lonA) = a
-        let (Lat latB, Lon lonB) = b
-        let (Lat latC, Lon lonC) = c
-        let (Lat latD, Lon lonD) = d
-        sprintf "geo.intersects(%s, geography'POLYGON((%M %M, %M %M, %M %M, %M %M))')" field latA lonA latB lonB latC lonC latD lonD
+        // TODO: Make some logic to sort coordinates to counterclockwise order
+        // and insert first coordinate at the end
+        polygon
+        |> Seq.map (fun (Lat lat, Lon lon) -> sprintf "%M %M" lon lat) // Notice that Azure search uses ordering lon lat
+        |> String.concat ", "
+        |> sprintf "geo.intersects(%s, geography'POLYGON((%s))')" field
 
 [<RequireQualifiedAccess>]
 module Filter =

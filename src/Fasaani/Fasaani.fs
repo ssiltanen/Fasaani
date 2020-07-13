@@ -6,7 +6,12 @@ open Microsoft.Azure.Search.Models
 type Lat = Lat of decimal
 type Lon = Lon of decimal
 type Coordinate = Lat * Lon
-type Polygon = Coordinate * Coordinate * Coordinate * Coordinate
+// Azure Search sets some rules for the polygon coordinates:
+// - At least 3 unique coordinates
+// - Points in a polygon must be in counterclockwise order
+// - The polygon needs to be closed, meaning the first and last point sets must be the same.
+// TODO: Create automatisation for the above
+type Polygon = Coordinate seq
 
 type BinaryOperation =
     | And
@@ -63,7 +68,7 @@ type Filter =
     | Not of Filter
     static member (+) (a,b) = Binary (a, And, b)
     static member (*) (a,b) = Binary (a, Or, b)
-    static member (!) a = Not a
+    static member (!!) a = Not a
 
 type QueryDetails =
     { Text: string option

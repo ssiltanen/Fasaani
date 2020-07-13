@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Evaluate.fs" />
-    <Compile Include="Search.fs" />
+    <Compile Include="UnitTests.fs" />
+    <Compile Include="IntegrationTests.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
 

@@ -3,7 +3,7 @@ storage: none
 
 nuget FSharp.Core
 nuget Microsoft.Azure.Search
-nuget TaskBuilder.fs
+nuget Ply
 
 // Test dependencies
 nuget Expecto

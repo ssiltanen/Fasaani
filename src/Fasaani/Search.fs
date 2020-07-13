@@ -3,7 +3,7 @@ module Fasaani.Search
 
 open System
 open System.Threading
-open FSharp.Control.Tasks.V2.ContextInsensitive
+open FSharp.Control.Tasks.Builders
 open Microsoft.Azure.Search
 
 let internal recordFields (t: Type) =
