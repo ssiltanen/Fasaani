@@ -59,15 +59,13 @@ let userId user = user.Id
 let userIds users = users |> Seq.map userId
 
 let gpsDistanceFromZero lat lon =
-    let lat1 = 0.0
-    let lon1 = 0.0
-    let lat2 = lat
-    let lon2 = lon
+    let lat0 = 0.0
+    let lon0 = 0.0
     let earhRadiusInMeters = 6371e3 // metres
-    let fii1 = lat1 * Math.PI / 180.0 // φ, λ in radians
-    let fii2 = lat2 * Math.PI / 180.0
-    let deltaFii = (lat2 - lat1) * Math.PI / 180.0
-    let deltaLambda = (lon2 - lon1) * Math.PI / 180.0
+    let fii1 = lat0 * Math.PI / 180.0 // fii, lambda in radians
+    let fii2 = lat * Math.PI / 180.0
+    let deltaFii = (lat - lat0) * Math.PI / 180.0
+    let deltaLambda = (lon - lon0) * Math.PI / 180.0
     let a =
         Math.Sin(deltaFii / 2.0) * Math.Sin(deltaFii / 2.0)
         + Math.Cos(fii1) * Math.Cos(fii2)
