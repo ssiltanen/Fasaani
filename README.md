@@ -4,11 +4,11 @@
 <img src="https://github.com/ssiltanen/Fasaani/raw/master/Logo.png" width="200px"/>
 </p>
 
-Fasaani is a simple F# wrapper on top of Azure Search .NET SDK. This library does not try to cover all functionality of the wrapped SDK, but instead it covers some common use cases of querying Azure Search indexes.
+Fasaani is a simple F# wrapper on top of Azure Search .NET SDK. It does not try to cover all functionality of the wrapped SDK, but instead it covers some common use cases of querying Azure Search indexes and offers an easy way to use the raw SDK underneath while still using the nicer syntax of Fasaani.
 
 ## Installation
 
-Download assembly from Nuget [https://www.nuget.org/packages/Fasaani](https://www.nuget.org/packages/Fasaani) and open namespace Fasaani in your code.
+Download the assembly from Nuget [https://www.nuget.org/packages/Fasaani](https://www.nuget.org/packages/Fasaani) and open namespace Fasaani in your code.
 
 ```fsharp
 open Fasaani
@@ -19,21 +19,25 @@ open Fasaani
 ```fsharp
 query {
     searchText "text used to search"    // Text searched from index
-    searchFields [ "SomeField" ]        // Which fields are matched with text search
+    searchFields [ "field" ]            // Which fields are matched with text search
     searchMode All                      // Whether any or all of the search terms must be matched. All or Any
     querySyntax Simple                  // Configure query to use simple syntax or Lucene syntax. Simple or Lucene
-    facets [ "facet1"; "facet2" ]       // Facets to return, see facets
+    facets [ "field"; "field2" ]        // Facets to return, see facets
     filter (where "field" Eq 1)         // Query filter, see filtering
     skip 10                             // Skip count of results, see paging
     top 25                              // How many results are returned, see paging
-    order [ byField "field1" Asc ]      // Order of returned results, see paging
+    order [ byField "field2" Asc ]      // Order of returned results, see paging
     includeTotalResultCount             // Return total matched results count, see paging
     requestOptions opt                  // Raw request options of underlying SDK, see Help! section
     //parameters par                    // Raw parameters of underlying SDK. Overwrites above other settings! See Help! section
-} |> searchAsync<MyModel> indexClient
+} |> searchAsync<'T> indexClient
 ```
 
-All above settings are optional so use only the ones you need in your query. More info of each can be found below. The parameters setting is commented out in the example to emphasize that it should not be used together with other settings as they overwrite each other if used in the same query. Extra mention also to Select parameter that sets the returned fields from result documents in the underlying library which is implicitly implemented in Fasaani from the output model properties.
+**All above settings are optional so use only the ones you need in your query.** More info of each can be found below. 
+
+The parameters setting is commented out in the example to emphasize that it **should not** be used together with other settings as **they overwrite each other** if used in the same query. This is supported to allow easy way to fall back to raw SDK, but using it is not recommended unless needed. 
+
+Extra mention also to Select parameter that sets the returned fields from result documents in the underlying library which is implicitly implemented in Fasaani from the output model properties.
 
 ## How to use
 
@@ -45,12 +49,12 @@ First create SearchIndexClient like you normally would. Notice that you should u
 use indexClient = new SearchIndexClient (searchName, indexName, SearchCredentials(searchQueryKey)) :> ISearchIndexClient
 ```
 
-After creating the client, define a basic text search query with Fasaani `search` computational expression, and pipe it to `searchAsync` expression to execute your query:
+After creating the client, define a basic text search query with Fasaani `query` computational expression, and pipe it to `searchAsync` expression to execute your query:
 
 ```fsharp
 query {
     searchText "text used to search"
-} |> searchAsync<MyModel> indexClient
+} |> searchAsync<'T> indexClient
 
 // Returns
 // type SearchResult<'T> =
@@ -60,7 +64,7 @@ query {
 //       Raw: DocumentSearchResult<'T> }
 ```
 
-Notice that you need to provide `searchAsync` expression with your type (here MyModel) to determine what type of results is returned.
+Notice that you need to provide `searchAsync` expression with a type parameter to determine what type of results is returned.
 
 In the response model, `Raw` contains the full as-is response the underlying SDK returned. This is returned to make sure that using this library does not prevent some use cases that are not pre-parsed for the user. The other three fields `Results`, `Facets`, and `Count` are pre-parsed from the underlying response for easier access in F#.
 
@@ -75,7 +79,9 @@ let filter3 = where "MyField" Eq null
 // etc..
 ```
 
-The supported comparison operators are `Eq`, `Ne`, `Gt`, `Lt`, `Ge`, and `Le`. It is also possible to create your raw OData filter:
+The supported comparison operators are `Eq`, `Ne`, `Gt`, `Lt`, `Ge`, and `Le`. 
+
+If Fasaani does not support a type of filter you need, it is also possible to create your raw OData filter:
 
 ```fsharp
 Filter.OData "MyField eq 'Value'"
@@ -116,7 +122,15 @@ It is also possible to create a filter for OData `search.in` function with helpe
 |> combineWithAnd
 ```
 
-After forming the filter, provide it to the search CE:
+To negate the filter you can use either `isNot` or operator `(!!)`
+
+```fsharp
+where "MyField" Eq "Value" |> isNot
+// or
+!! (where "MyField" Eq "Value")
+```
+
+After forming the filter, provide it to the `query` CE:
 
 ```fsharp
 let filterExpr =
@@ -127,13 +141,13 @@ let filterExpr =
 
 query {
     filter filterExpr
-} |> searchAsync<MyModel> indexClient
+} |> searchAsync<'T> indexClient
 
 // Or with some text search
 query {
     searchText "Some text to search with"
     filter filterExpr
-} |> searchAsync<MyModel> indexClient
+} |> searchAsync<'T> indexClient
 ```
 
 #### Geo functions
@@ -175,7 +189,7 @@ query {
     top 100
     order [ byField "field1" Asc; byDistance "field2" (Lat -122.131577M, Lon 47.678581M) Desc; bySearchScore Desc ]
     includeTotalResultCount
-} |> searchAsync<MyModel> indexClient
+} |> searchAsync<'T> indexClient
 ```
 
 ### Facets
@@ -185,30 +199,32 @@ Specify collection of facets to return them in the response
 ```fsharp
 query {
     searchText "Search text"
-    facets [ "Facet1"; "Facet2" ] // Response Facets are empty unless these are provided
-} |> searchAsync<MyModel> indexClient
+    facets [ "field1"; "field2" ] // Response Facets are empty unless these are provided
+} |> searchAsync<'T> indexClient
 ```
+
+In the return value, facets are returned as a `Map<string, string seq>` where keys are the field names specified in the query facets above (in this case field1 and field2). and payload contains unique values of that field.
 
 ### Search mode
 
-To specify whether any or all of the search terms must match in order to count the document as a match. Possible values include: Any, All
+To specify whether any or all of the search terms must match in order to count the document as a match. Possible values include: `Any`, `All`
 
 ```fsharp
 query {
     searchText "Search text"
     searchMode All
-} |> searchAsync<MyModel> indexClient
+} |> searchAsync<'T> indexClient
 ```
 
 ### Search query syntax aka query mode
 
-To specify query mode i.e. the syntax used in the query, provide querySyntax value of possible values Simple, Lucene.
+To specify query mode i.e. the syntax used in the query, provide querySyntax value of possible values `Simple`, `Lucene`.
 
 ```fsharp
 query {
     searchText "Search text"
     querySyntax Lucene
-} |> searchAsync<MyModel> indexClient
+} |> searchAsync<'T> indexClient
 ```
 
 ### Select
@@ -223,7 +239,7 @@ To limit which fields Azure Search uses for text search, provide search fields i
 query {
     searchText "Search text"
     searchFields [ "field1"; "field2" ]
-} |> searchAsync<MyModel> indexClient
+} |> searchAsync<'T> indexClient
 ```
 
 ### Special constants
@@ -241,7 +257,7 @@ let filter =
 
 ### Query configuration
 
-So far in each example we have the `searchAsync` function. This function is the non configurable version of `SearchWithConfigAsync`, which can be configured to logger function and/or cancellation token.
+So far in each example we have used the `searchAsync` function. This function is the non-configurable version of search function. To customize how the search is executed, use `SearchWithConfigAsync`, which can be configured to logger function and/or cancellation token.
 
 Logging with config record works by creating a record of `SearchConfig` with `Log` value. This field is a function that is called before query execution if it is provided. For now it is user's responsibility to provide the implementation for that function in a form that pleases them.
 
@@ -250,21 +266,24 @@ Cancellation token works in the same fashion as logging. If `CancellationToken` 
 For Example:
 
 ```fsharp
+// Type specified here for documentation purposes
 type SearchConfig =
     { Log: (string option -> SearchParameters -> SearchRequestOptions option -> unit) option
       CancellationToken: CancellationToken option }
 
+// Example of how to specify the config record
 let configWithLogging =
-    { Log = 
+    { Log =
         fun str parameters options ->
             str |> Option.iter log.LogInformation // Logging provider not specified here
             parameters.Filter |> Option.ofObj |> Option.iter log.LogInformation
+        |> Some
       CancellationToken = None }
 
 query {
     searchText "Search text"
     filter (where "MyField" Eq "Bear")
-} |> searchWithConfigAsync<MyModel> indexClient configWithLogging
+} |> searchWithConfigAsync<'T> indexClient configWithLogging
 ```
 
 ## Help! Fasaani does not support my use case
@@ -280,7 +299,7 @@ query {
     searchText "Search text"
     parameters customParameters
     requestOptions customRequestOptions
-} |> searchAsync<MyModel> indexClient
+} |> searchAsync<'T> indexClient
 ```
 
-In addition, the raw `DocumentSearchResult<'T>` object from underlying method is also returned as `Raw` in the response body.
+In addition, the raw `DocumentSearchResult<'T>` object from underlying method is also returned as `Raw` in the response body for access to values not offered by Fasaani.
