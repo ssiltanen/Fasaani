@@ -270,15 +270,15 @@ For Example:
 ```fsharp
 // Type specified here for documentation purposes
 type SearchConfig =
-    { Log: (string option -> SearchParameters -> SearchRequestOptions option -> unit) option
+    { Log: (QueryDetails -> unit) option
       CancellationToken: CancellationToken option }
 
 // Example of how to specify the config record
 let configWithLogging =
     { Log =
-        fun str parameters options ->
-            str |> Option.iter log.LogInformation // Logging provider not specified here
-            parameters.Filter |> Option.ofObj |> Option.iter log.LogInformation
+        fun details ->
+            details.Text |> Option.iter log.LogInformation // Logging provider not specified here
+            details.Parameters.Filter |> Option.ofObj |> Option.iter log.LogInformation
         |> Some
       CancellationToken = None }
 
