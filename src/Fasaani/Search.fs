@@ -3,17 +3,17 @@ module Fasaani.Search
 
 open System
 open System.Threading
-open FSharp.Control.Tasks.Builders
+open FSharp.Control.Tasks
 open Microsoft.Azure.Search
 
 let internal recordFields (t: Type) =
     Reflection.FSharpType.GetRecordFields t
     |> Array.map (fun x -> x.Name)
 
-let internal search<'T> (client: ISearchIndexClient) (config: SearchConfig option) (details: QueryDetails) =
+let internal searchIndex<'T> (client: ISearchIndexClient) (config: SearchConfig option) (details: QueryDetails) =
     config
     |> Option.bind (fun c -> c.Log)
-    |> Option.iter (fun log -> log details.Text details.Parameters details.RequestOptions)
+    |> Option.iter (fun log -> log details)
 
     task {
         // Return only fields used in the return record type
@@ -23,10 +23,8 @@ let internal search<'T> (client: ISearchIndexClient) (config: SearchConfig optio
                 details.Text |> Option.toObj,
                 details.Parameters,
                 details.RequestOptions |> Option.toObj,
-                config |> Option.bind (fun c -> c.CancellationToken) |> Option.defaultValue (CancellationToken.None))
+                config |> Option.bind (fun c -> c.CancellationToken) |> Option.defaultValue CancellationToken.None)
 
-        let results = searchResult.Results |> Seq.map (fun r -> r.Document)
-        let count = searchResult.Count |> Option.ofNullable
         let facets =
             searchResult.Facets
             |> Option.ofObj
@@ -36,14 +34,22 @@ let internal search<'T> (client: ISearchIndexClient) (config: SearchConfig optio
             |> Option.defaultValue Map.empty
 
         return
-            { Results = results
+            { Results = searchResult.Results |> Seq.map (fun r -> r.Document)
               Facets = facets
-              Count = count
+              Count = Option.ofNullable searchResult.Count
               Raw = searchResult }
     }
 
 let searchWithConfigAsync<'T> (client: ISearchIndexClient) (config: SearchConfig) (details: QueryDetails) =
-    search<'T> client (Some config) details
+    searchIndex<'T> client (Some config) details
+
+let searchWithConfig<'T> client config details =
+    searchWithConfigAsync<'T> client config details
+    |> Async.AwaitTask |> Async.RunSynchronously
 
 let searchAsync<'T> (client: ISearchIndexClient) (details: QueryDetails) =
-    search<'T> client None details
+    searchIndex<'T> client None details
+
+let search<'T> client details =
+    searchAsync<'T> client details
+    |> Async.AwaitTask |> Async.RunSynchronously

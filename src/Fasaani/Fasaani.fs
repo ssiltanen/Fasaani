@@ -82,5 +82,5 @@ type SearchResult<'T> =
       Raw: DocumentSearchResult<'T> }
 
 type SearchConfig =
-    { Log: (string option -> SearchParameters -> SearchRequestOptions option -> unit) option
+    { Log: (QueryDetails -> unit) option
       CancellationToken: CancellationToken option }

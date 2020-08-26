@@ -8,7 +8,7 @@ Fasaani is a simple F# wrapper on top of Azure Search .NET SDK. It does not try 
 
 ## Installation
 
-Download the assembly from Nuget [https://www.nuget.org/packages/Fasaani](https://www.nuget.org/packages/Fasaani) and open namespace Fasaani in your code.
+Download the assembly from Nuget [https://www.nuget.org/packages/Fasaani](https://www.nuget.org/packages/Fasaani) and open namespace `Fasaani` in your code.
 
 ```fsharp
 open Fasaani
@@ -39,14 +39,16 @@ The parameters setting is commented out in the example to emphasize that it **sh
 
 Extra mention also to Select parameter that sets the returned fields from result documents in the underlying library which is implicitly implemented in Fasaani from the output model properties.
 
+There are synchronous and asynchronous version of each search function, but as async versions are highly recommended for actual use, the examples here are done using the async versions of these functions.
+
 ## How to use
 
 ### Basic query
 
-First create SearchIndexClient like you normally would. Notice that you should use the secondary key as it has less privileges.
+First create SearchIndexClient by calling `searchIndexClient` function. Notice that you should use the secondary key as it has less privileges and don't forget to `use` since the returned ISearchIndexClient implements IDisposable interface.
 
 ```fsharp
-use indexClient = new SearchIndexClient (searchName, indexName, SearchCredentials(searchQueryKey)) :> ISearchIndexClient
+use indexClient = searchIndexClient searchName searchQueryKey indexName
 ```
 
 After creating the client, define a basic text search query with Fasaani `query` computational expression, and pipe it to `searchAsync` expression to execute your query:
@@ -284,6 +286,34 @@ query {
     searchText "Search text"
     filter (where "MyField" Eq "Bear")
 } |> searchWithConfigAsync<'T> indexClient configWithLogging
+```
+
+## Azure Search Clients
+
+Azure Search SDK has two client classes and interfaces for them: `ISearchServiceIndex` and `ISearchIndexClient`.
+
+`ISearchServiceClient` is used to manage the Search service that hosts all the indices, eg. create and destroy indices and indexers.
+
+`ISearchIndexClient` is used to query a certain index and/or to insert data into the index.
+
+When creating these clients it is important to notice that when Azure provides two keys to access the Search service: `Admin` and `Query` keys. Admin key is needed to create the `ISearchServiceIndex` and when inserting/updating/deleting data from index with `ISearchIndexClient`.
+
+To make it easier to create these clients, Fasaani implements `searchServiceClient`, `searchIndexClient`, and `searchIndexAdminClient` functions.
+
+```fsharp
+let adminKey = "..."
+let queryKey = "..."
+
+// Create service client
+use serviceClient = searchServiceClient "mySearch" adminKey
+
+// It is recommended to create index client using query key if you dont need to
+// mutate data in the index
+use indexClient = searchIndexClient "mySearch" queryKey "myIndex"
+
+// Another way to create index client is to create it with service client,
+// however this index client uses admin privileges.
+use indexAdminClient = searchIndexAdminClient serviceClient "myIndex"
 ```
 
 ## Help! Fasaani does not support my use case

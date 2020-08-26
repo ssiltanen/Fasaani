@@ -8,9 +8,10 @@ let integrationTestConfig file =
     (File.ReadAllText file, JsonSerializerOptions())
     |> JsonSerializer.Deserialize<IntegrationTests.AzureSearchConfig>
 
+let configFile = "azureSearchConfig.json"
+
 [<EntryPoint>]
 let main argv =
-    let configFile = "azureSearchConfig.json"
     let ableToRunIntegrationTests = File.Exists configFile
     [ UnitTests.filter
       UnitTests.orderBy

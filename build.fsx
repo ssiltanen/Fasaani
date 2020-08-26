@@ -42,7 +42,7 @@ let cleanAll () =
 let deployTestInfra () =
     let mySearch = search {
         name "fasaani-test-search"
-        sku Search.Basic
+        sku Search.Free
     }
     let template = arm {
         location Location.WestEurope
