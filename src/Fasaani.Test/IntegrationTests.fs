@@ -7,6 +7,7 @@ open Microsoft.Azure.Search
 open Microsoft.Azure.Search.Models
 open Microsoft.Spatial
 open Fasaani
+open Fasaani.Index
 
 [<CLIMutable>]
 type AzureSearchConfig =
@@ -500,32 +501,34 @@ let testsWithSetup setup = [
 Setup functions to setup and clean up for each test above
 *)
 
-let insertDataIntoIndex(client : ISearchIndexClient) documents =
-    documents
-    |> List.map (fun (doc : 'a) -> IndexAction.Upload(doc))
-    |> IndexBatch.New
-    |> client.Documents.Index
-    |> fun indexingResult ->
+let insertDataIntoIndex (client : ISearchIndexClient) =
+    Seq.map (IndexAction.Upload)
+    >> IndexBatch.New
+    >> fun (batch : IndexBatch<'a>) -> client.Documents.Index(batch)
+    >> fun indexingResult ->
         // Not proud of this hack but, indexing seem to need some time before documents are queryable
-        Async.Sleep 1500 |> Async.RunSynchronously
+        Async.Sleep 2000 |> Async.RunSynchronously
         seq indexingResult.Results
 
 let tests (config : AzureSearchConfig) =
-    testsWithSetup (fun test ->
+    testsWithSetup (fun testCase ->
         // For each test
         // create index, client management and querying client
         // at the end destroy index
-        use serviceClient = new SearchServiceClient (config.SearchName, SearchCredentials (config.AdminKey)) :> ISearchServiceClient
-        let index = Index()
-        index.Name <- "users"
-        index.Fields <- FieldBuilder.BuildForType<UsersIndex>()
+        use serviceClient = searchServiceClient config.SearchName config.AdminKey
+        let idx =
+            index {
+                name "users-index"
+                fields (fieldsOfType<UsersIndex>())
+            }
+
         try
-            serviceClient.Indexes.CreateOrUpdate index |> ignore
-            use indexClient = new SearchIndexClient (config.SearchName, index.Name, SearchCredentials(config.QueryKey)) :> ISearchIndexClient
-            use insertClient = serviceClient.Indexes.GetClient index.Name
-            test indexClient (insertDataIntoIndex insertClient)
+            createOrUpdateIndex serviceClient idx |> ignore
+            use indexClient = searchIndexClient config.SearchName config.QueryKey idx.Index.Name
+            use insertClient = searchIndexAdminClient serviceClient idx.Index.Name
+            testCase indexClient (insertDataIntoIndex insertClient)
         finally
-            if serviceClient.Indexes.Exists(index.Name) then
-                serviceClient.Indexes.Delete(index.Name)
+            if serviceClient.Indexes.Exists(idx.Index.Name) then
+                serviceClient.Indexes.Delete(idx.Index.Name)
     )
     |> testList "Integration test"

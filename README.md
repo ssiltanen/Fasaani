@@ -316,6 +316,50 @@ use indexClient = searchIndexClient "mySearch" queryKey "myIndex"
 use indexAdminClient = searchIndexAdminClient serviceClient "myIndex"
 ```
 
+## Index and Indexer
+
+It is possible to create indices and indexers with Fasaani syntax. For that purpose, Fasaani has computation expressions `index` and `indexer`.
+
+```fsharp
+open Fasaani.Index
+
+// Service client with admin key is needed
+let client = searchServiceClient "search-name" "admin-key"
+
+// Define data source as you would normally
+let source = DataSource.AzureBlobStorage ("connection-name", connectionString, "container")
+
+let indexer1 =
+    indexer {
+        name "indexer1"
+        interval (TimeSpan.FromHours 1.)
+        dataSource (CreateOrUpdate source)
+        parameters (IndexingParameters().ParseJsonArrays())
+    }
+
+// When creating indexer with existing data source, name of the data source is then enough
+let indexer2 =
+    indexer {
+        name "indexer2"
+        startTime (DateTimeOffset())
+        interval (TimeSpan.FromHours 2.)
+        dataSource (UseExisting "connection-name")
+        parameters (IndexingParameters().ParseJsonArrays())
+    }
+
+// Creating index with indexers creates all of them on one stroke
+index {
+    name "example-index"
+    fields (fieldsOfType<MyType>())
+    indexers [ indexer1; indexer2 ]
+} |> createOrUpdateIndexAsync client
+
+// However it is possible to create indexers separately also
+indexer1 |> createOrUpdateIndexerAsync client "example-index"
+```
+
+For now only a limited set of index and indexer features are supported in the CEs, so Fasaani supports overwriting values in CEs using `overWriteWith` method to give access to using the create functions. This method replaces the underlaying Index and Indexer object.
+
 ## Help! Fasaani does not support my use case
 
 To mitigate the small set of features in Fasaani, it is possible to overwrite search parameters, and search request options of the query with `parameters`, and `requestOptions` operators, while still using the Fasaani query syntax:

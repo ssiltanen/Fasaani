@@ -1,3 +1,9 @@
+### 1.2.0
+
+- Add CEs for Index and Indexer to make creating indices and indexers easier
+- Add functions to create resources based on Index and Indexer CEs
+
+
 ### 1.1.0
 
 - Add helper functions to create Azure Search clients

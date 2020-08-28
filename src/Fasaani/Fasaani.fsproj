@@ -4,7 +4,7 @@
 
     <!-- General -->
     <AssemblyName>Fasaani</AssemblyName>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <Description>Thin F# wrapper for Azure Search .NET SDK </Description>
     <Authors>Sampo Siltanen</Authors>
     
@@ -27,11 +27,13 @@
     <!-- SourceLink settings 
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat> -->
-
   </PropertyGroup>
   
   <ItemGroup>
     <Compile Include="Fasaani.fs" />
+    <Compile Include="Index.fs" />
+    <Compile Include="IndexBuilder.fs" />
+    <Compile Include="IndexerBuilder.fs" />
     <Compile Include="Client.fs" />
     <Compile Include="Evaluate.fs" />
     <Compile Include="QueryBuilder.fs" />
