@@ -1,3 +1,8 @@
+### 1.2.1
+
+- Add more properties to index and indexer CEs.
+- Add validate support for index and its indexers.
+
 ### 1.2.0
 
 - Add CEs for Index and Indexer to make creating indices and indexers easier

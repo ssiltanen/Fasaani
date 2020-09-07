@@ -33,7 +33,7 @@ module Operation =
                         return dataSource.Name
                     }
                 | None ->
-                    failwith "Cannot create indexer without a data source"
+                    failwithf "Indexer %s is missing a data source" indexerDefinition.Indexer.Name
             indexerDefinition.Indexer.TargetIndexName <- indexName
             indexerDefinition.Indexer.DataSourceName <- dataSource
             return! client.Indexers.CreateOrUpdateAsync indexerDefinition.Indexer
@@ -56,3 +56,13 @@ module Operation =
     let createOrUpdateIndex client indexDefinition =
         createOrUpdateIndexAsync client indexDefinition
         |> Async.AwaitTask |> Async.RunSynchronously
+
+    let validateIndex (indexDefinition: IndexDefinition) =
+        try
+            indexDefinition.Index.Validate()
+            indexDefinition.Indexers
+            |> List.iter (fun idxer -> idxer.Indexer.Validate())
+            Ok indexDefinition
+        with
+        | :? Microsoft.Rest.ValidationException as ex -> Error ex
+        | _ -> reraise()

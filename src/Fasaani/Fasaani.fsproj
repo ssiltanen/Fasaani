@@ -4,7 +4,7 @@
 
     <!-- General -->
     <AssemblyName>Fasaani</AssemblyName>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <Description>Thin F# wrapper for Azure Search .NET SDK </Description>
     <Authors>Sampo Siltanen</Authors>
     

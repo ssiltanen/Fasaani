@@ -3,6 +3,10 @@ namespace Fasaani.Index
 open System
 open Microsoft.Azure.Search.Models
 
+type IndexerFieldMapping =
+    | Input of FieldMapping seq
+    | Output of FieldMapping seq
+
 [<AutoOpen>]
 module IndexerBuilder =
 
@@ -12,7 +16,7 @@ module IndexerBuilder =
             { Indexer = Indexer()
               DataSource = None }
 
-        /// Sets the index name
+        /// Sets the indexer name
         [<CustomOperation"name">]
         member _.Name(state: IndexerDefinition, name) =
             state.Indexer.Name <- name
@@ -51,14 +55,41 @@ module IndexerBuilder =
             state.Indexer.Parameters <- parameters
             state
 
+        /// Sets the indexer description
+        [<CustomOperation"description">]
+        member _.Description(state: IndexerDefinition, description) =
+            state.Indexer.Description <- description
+            state
+
+        /// Sets the indexer etag
+        [<CustomOperation"etag">]
+        member _.ETag(state: IndexerDefinition, etag) =
+            state.Indexer.ETag <- etag
+            state
+
+        /// Sets the indexer field mappings
+        [<CustomOperation"fieldMappings">]
+        member _.FieldMappings(state: IndexerDefinition, fieldMappings: IndexerFieldMapping) =
+            match fieldMappings with
+            | Input mappings -> state.Indexer.FieldMappings <- ResizeArray<FieldMapping> mappings
+            | Output mappings -> state.Indexer.OutputFieldMappings <- ResizeArray<FieldMapping> mappings
+            state
+
+        /// Sets the indexer is disabled. Default value is false
+        [<CustomOperation"disabled">]
+        member _.Disabled(state: IndexerDefinition, isDisabled) =
+            state.Indexer.IsDisabled <- Nullable isDisabled
+            state
+
+        /// Sets the indexer skill set name
+        [<CustomOperation"skillSet">]
+        member _.SkillSet(state: IndexerDefinition, name) =
+            state.Indexer.SkillsetName <- name
+            state
+
         /// Sets the index fields
         [<CustomOperation"dataSource">]
         member _.DataSource(state: IndexerDefinition, dataSource) =
             { state with DataSource = Some dataSource}
-
-        /// Overwrites index settings
-        [<CustomOperation"overWriteWith">]
-        member _.OverWriteWith(state: IndexerDefinition, indexer) =
-            { state with Indexer = indexer }
 
     let indexer = IndexerDefinitionBuilder ()

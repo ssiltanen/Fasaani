@@ -327,7 +327,7 @@ open Fasaani.Index
 let client = searchServiceClient "search-name" "admin-key"
 
 // Define data source as you would normally
-let source = DataSource.AzureBlobStorage ("connection-name", connectionString, "container")
+let source = DataSource.AzureBlobStorage("connection-name", connectionString, "container")
 
 let indexer1 =
     indexer {
@@ -356,9 +356,14 @@ index {
 
 // However it is possible to create indexers separately also
 indexer1 |> createOrUpdateIndexerAsync client "example-index"
+
+// Or if you want to validate index before create call
+index |> validateIndex |> Result.map (createOrUpdateIndexAsync client)
 ```
 
-For now only a limited set of index and indexer features are supported in the CEs, so Fasaani supports overwriting values in CEs using `overWriteWith` method to give access to using the create functions. This method replaces the underlaying Index and Indexer object.
+Other possible settings for the Index CE include `analyzers`, `charFilters`, `cors`, `defaultScoringProfile`, `etag`, `scoringProfiles`, `suggesters`, `tokenFilters`, and `tokenizers`. They are operated the same way as the original library.
+
+Other possible settings for the Indexer CE include `description`, `etag`, `fieldMappings`, `disabled`, and `skillSet`.
 
 ## Help! Fasaani does not support my use case
 

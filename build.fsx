@@ -102,23 +102,14 @@ Target.create "Clean"           (fun _ -> cleanAll())
 Target.create "DeployTestInfra" (fun _ -> deployTestInfra ())
 Target.create "Build"           (fun _ -> build projectPath)
 Target.create "BuildTests"      (fun _ -> build testProjectPath)
-Target.create "RunTests"        (fun _ -> Expecto.run id [ testAssembly ])
-Target.create "Test"            ignore
+Target.create "Test"            (fun _ -> Expecto.run id [ testAssembly ])
 Target.create "Pack"            (fun _ -> createNuget projectPath)
 Target.create "Publish"         (fun _ -> pushNuget projectPath)
 
-"Clean"
-  ==> "Build"
+"Clean" ?=> "Build"
+"Clean" ?=> "BuildTests"
+"BuildTests" ?=> "Test"
 
-"Clean"
-  ==> "BuildTests"
-  ==> "RunTests"
-  ==> "Test"
-
-"Clean"
-  ==> "BuildTests"
-  ==> "RunTests"
-  ==> "Pack"
-  ==> "Publish"
+"Publish" <== [ "Pack"; "Test" ]
 
 Target.runOrDefault "Build"
