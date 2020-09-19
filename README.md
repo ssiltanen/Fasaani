@@ -246,7 +246,7 @@ query {
 
 ### Special constants
 
-Fasaani maps F# float special values (`nan`, `infinity`, `infinity`) to OData counterpars (NaN, INF, -INF)
+Fasaani maps F# float special values (`nan`, `infinity`, `-infinity`) to OData counterpars (NaN, INF, -INF)
 
 These can be used in filters for example:
 

@@ -110,6 +110,6 @@ Target.create "Publish"         (fun _ -> pushNuget projectPath)
 "Clean" ?=> "BuildTests"
 "BuildTests" ?=> "Test"
 
-"Publish" <== [ "Pack"; "Test" ]
+"Publish" <== [ "Pack"; "Test"; "BuildTests"; "Clean" ]
 
 Target.runOrDefault "Build"

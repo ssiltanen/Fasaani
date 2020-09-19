@@ -362,9 +362,9 @@ let testsWithSetup setup = [
             let user = List.head users
             let userLat = decimal user.Coordinate.Latitude
             let userLon = decimal user.Coordinate.Longitude
-            let coordinateA = Lat (userLat + 2M), Lon (userLon - 2M)
-            let coordinateB = Lat (userLat + 1M), Lon (userLon - 2M)
-            let coordinateC = Lat (userLat + 1M), Lon (userLon - 1M)
+            let coordinateA = Lat (userLat + 5M), Lon (userLon - 5M)
+            let coordinateB = Lat (userLat + 2M), Lon (userLon - 5M)
+            let coordinateC = Lat (userLat + 2M), Lon (userLon - 2M)
             let searchResults =
                 query {
                     // Notice that last coordinates must equal to the first and coordinates to be in counterclockwise order
@@ -507,7 +507,7 @@ let insertDataIntoIndex (client : ISearchIndexClient) =
     >> fun (batch : IndexBatch<'a>) -> client.Documents.Index(batch)
     >> fun indexingResult ->
         // Not proud of this hack but, indexing seem to need some time before documents are queryable
-        Async.Sleep 2000 |> Async.RunSynchronously
+        Async.Sleep 3000 |> Async.RunSynchronously
         seq indexingResult.Results
 
 let tests (config : AzureSearchConfig) =
