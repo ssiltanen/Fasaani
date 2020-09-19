@@ -74,6 +74,48 @@ type QueryDetails =
     { Text: string option
       Parameters: SearchParameters
       RequestOptions: SearchRequestOptions option }
+    static member ToString (q: QueryDetails) =
+        let flatten =
+            Option.ofObj
+            >> Option.map (String.concat ", " >> sprintf "[ %s ]")
+            >> Option.toObj
+
+        let p = q.Parameters
+        let newLine = System.Environment.NewLine
+        let scoringParameters =
+            p.ScoringParameters
+            |> Option.ofObj
+            |> Option.map (Seq.map (fun sp -> printf "%s: %O" sp.Name (sp.Values |> flatten)))
+            |> Option.toObj
+
+        let details =
+            [ "Filter",             box p.Filter
+              "Search Text",        box (Option.toObj q.Text)
+              "Query Type",         box (q.Text |> Option.map (fun _ -> string p.QueryType) |> Option.toObj)
+              "Search Mode",        box (q.Text |> Option.map (fun _ -> string p.SearchMode) |> Option.toObj)
+              "Search Fields",      box (flatten p.SearchFields)
+              "Highlight Fields",   box (flatten p.HighlightFields)
+              "Highlight Post Tag", box p.HighlightPostTag
+              "Highlight Pre Tag",  box p.HighlightPreTag
+              "Minimum Coverage",   box p.MinimumCoverage
+              "Scoring Profile",    box p.ScoringProfile
+              "Scoring Parameters", box scoringParameters
+              "Facets",             box (flatten p.Facets)
+              "Skip",               box p.Skip
+              "Top",                box p.Top
+              "Order By",           box (flatten p.OrderBy) ]
+           |> List.where (snd >> unbox >> isNull >> not)
+           |> function
+           | [] -> ""
+           | details ->
+                details
+                |> List.map (fun (name, value) -> sprintf "%s: %O" name value)
+                |> String.concat (newLine + "    ")
+                |> sprintf "%s    %s" newLine
+
+        sprintf "Query {%s%s    Count Total Results: %b%s}"
+            details newLine p.IncludeTotalResultCount newLine
+
 
 type SearchResult<'T> =
     { Results: 'T seq

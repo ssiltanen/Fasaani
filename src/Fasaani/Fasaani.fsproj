@@ -4,7 +4,7 @@
 
     <!-- General -->
     <AssemblyName>Fasaani</AssemblyName>
-    <Version>1.2.1</Version>
+    <Version>1.2.2</Version>
     <Description>Thin F# wrapper for Azure Search .NET SDK </Description>
     <Authors>Sampo Siltanen</Authors>
     
@@ -23,10 +23,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/ssiltanen/Fasaani</RepositoryUrl>
-
-    <!-- SourceLink settings 
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat> -->
+    
   </PropertyGroup>
   
   <ItemGroup>
@@ -38,9 +35,10 @@
     <Compile Include="Evaluate.fs" />
     <Compile Include="QueryBuilder.fs" />
     <Compile Include="Search.fs" />
-    <None Include="..\..\Logo.png" Pack="true" PackagePath="\"/>
-    <None Include="..\..\LICENSE" Pack="true" PackagePath="\"/>
+    <Compile Include="Config.fs" />
+    <None Include="../../Logo.png" Pack="true" PackagePath="/"/>
+    <None Include="../../LICENSE" Pack="true" PackagePath="/"/>
   </ItemGroup>
 
-  <Import Project="..\..\.paket\Paket.Restore.targets" />
+  <Import Project="../../.paket/Paket.Restore.targets" />
 </Project>

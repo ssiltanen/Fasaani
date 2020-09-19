@@ -1,3 +1,8 @@
+### 1.2.2
+
+- Add static ToString method for QueryDetails to pretty print query details
+- Add function to make default configs using QueryDetails.ToString function
+
 ### 1.2.1
 
 - Add more properties to index and indexer CEs.

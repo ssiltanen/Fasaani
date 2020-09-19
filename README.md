@@ -265,6 +265,8 @@ Logging with config record works by creating a record of `SearchConfig` with `Lo
 
 Cancellation token works in the same fashion as logging. If `CancellationToken` is provided with `SearchConfig` record, it is passed to the underlying SDK. Otherwise CancellationToken.None is passed.
 
+Fasaani offers a simple `defaultConfig` function that accepts a logger method of (string -> unit) to log query details. This function uses QueryDetails.ToString static method under the hoods to print the settings used in query.
+
 For Example:
 
 ```fsharp
@@ -273,7 +275,10 @@ type SearchConfig =
     { Log: (QueryDetails -> unit) option
       CancellationToken: CancellationToken option }
 
-// Example of how to specify the config record
+// Example of using default configs
+let configWithLogging = defaultConfig log.LogInformation // Logging provider not specified here
+
+// Example of how to specify the config record with your custom evaluator
 let configWithLogging =
     { Log =
         fun details ->
