@@ -34,7 +34,7 @@ jobs:
       - name: Tool Restore
         run: dotnet tool restore
       - name: Restore
-        run: dotnet restore
+        run: dotnet paket restore
       - name: Build
         run: dotnet build -p src/$PROJECT_NAME -c Release --no-restore
       - name: Test
