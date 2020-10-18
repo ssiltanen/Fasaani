@@ -11,6 +11,7 @@
     <OutputType>Library</OutputType>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
     <!-- NuGet Pack settings -->
     <PackageId>Fasaani</PackageId>
     <PackageIcon>Logo.png</PackageIcon>
