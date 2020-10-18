@@ -1,19 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-
     <!-- General -->
     <AssemblyName>Fasaani</AssemblyName>
-    <Version>1.2.2</Version>
     <Description>Thin F# wrapper for Azure Search .NET SDK </Description>
     <Authors>Sampo Siltanen</Authors>
-    
     <!-- Build settings -->
     <TargetFramework>netstandard2.0</TargetFramework>
     <DebugType>portable</DebugType>
     <OutputType>Library</OutputType>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-
     <!-- NuGet Pack settings -->
     <PackageId>Fasaani</PackageId>
     <PackageIcon>Logo.png</PackageIcon>
@@ -23,9 +20,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/ssiltanen/Fasaani</RepositoryUrl>
-    
   </PropertyGroup>
-  
   <ItemGroup>
     <Compile Include="Fasaani.fs" />
     <Compile Include="Index.fs" />
@@ -36,9 +31,8 @@
     <Compile Include="QueryBuilder.fs" />
     <Compile Include="Search.fs" />
     <Compile Include="Config.fs" />
-    <None Include="../../Logo.png" Pack="true" PackagePath="/"/>
-    <None Include="../../LICENSE" Pack="true" PackagePath="/"/>
+    <None Include="../../Logo.png" Pack="true" PackagePath="/" />
+    <None Include="../../LICENSE" Pack="true" PackagePath="/" />
   </ItemGroup>
-
-  <Import Project="../../.paket/Paket.Restore.targets" />
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

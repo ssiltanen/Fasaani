@@ -387,3 +387,11 @@ query {
 ```
 
 In addition, the raw `DocumentSearchResult<'T>` object from underlying method is also returned as `Raw` in the response body for access to values not offered by Fasaani.
+
+## Contirubtions
+
+When contributing to this repository, please first discuss the change you wish to make via an open issue before submitting a pull request. For new feature requests please describe your idea in more detail and how it could benefit other users as well. Please be aware that Fasaani aims to be a light, thin abstraction over the Azure SDK.
+
+After your change has been approved, please submit your PR against `dev` branch.
+
+Use existing code as a guideline for code conventions and keep documentation as well as tests up-to-date.
