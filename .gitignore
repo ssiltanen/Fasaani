@@ -1,9 +1,9 @@
 .fake
 .ionide
+.farmer
 bin/
 obj/
 paket-files/
 packages/
 azuredeploysettings.json
-farmer-deploy.json
 src/Fasaani.Test/azureSearchConfig.json

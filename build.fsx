@@ -11,7 +11,6 @@ open System.IO
 open Fake.Core
 open Fake.DotNet
 open Fake.DotNet.Testing
-open Fake.DotNet.NuGet
 open Fake.IO
 open Fake.IO.FileSystemOperators
 open Fake.IO.Globbing.Operators
@@ -26,8 +25,6 @@ Target.initEnvironment ()
 let deployConfig () = "azuredeploysettings.json" |> System.IO.File.ReadAllText |> JObject.Parse
 let subscriptionIdOrName () = deployConfig () |> fun conf -> string conf.["subscriptionIdOrName"]
 let resourceGroup () = deployConfig () |> fun conf -> string conf.["resourceGroup"]
-let nugetKeyEnvVariableName = "NUGET_KEY"
-let nugetKey = Environment.environVarOrNone nugetKeyEnvVariableName
 
 let projectPath = "src" </> "Fasaani"
 let testProjectPath = "src" </> "Fasaani.Test"
@@ -79,37 +76,14 @@ let deployTestInfra () =
 let build project =
     DotNet.build (fun defaults -> { defaults with Configuration = DotNet.BuildConfiguration.Release }) project
 
-let createNuget project =
-    project |> DotNet.restore (fun defaults -> { defaults with NoCache = true })
-    project |> DotNet.pack (fun defaults -> { defaults with Configuration = DotNet.BuildConfiguration.Release })
-
-let pushNuget project =
-    let apiKey =
-        match nugetKey with
-        | Some key -> key
-        | None -> failwithf "The NuGet API key must be set in a %s environmental variable" nugetKeyEnvVariableName
-    let setNugetPushParams (defaults: NuGet.NuGetPushParams) =
-        { defaults with
-            Source = Some "https://api.nuget.org/v3/index.json"
-            ApiKey = Some apiKey }
-    let nupkgFolder = project </> "bin" </> "Release"
-
-    nupkgFolder </> (Directory.findFirstMatchingFile "Fasaani.*.nupkg" nupkgFolder)
-    |> Path.getFullName
-    |> DotNet.nugetPush (fun defaults -> { defaults with PushParams = setNugetPushParams defaults.PushParams })
-
 Target.create "Clean"           (fun _ -> cleanAll())
 Target.create "DeployTestInfra" (fun _ -> deployTestInfra ())
 Target.create "Build"           (fun _ -> build projectPath)
 Target.create "BuildTests"      (fun _ -> build testProjectPath)
 Target.create "Test"            (fun _ -> Expecto.run id [ testAssembly ])
-Target.create "Pack"            (fun _ -> createNuget projectPath)
-Target.create "Publish"         (fun _ -> pushNuget projectPath)
 
 "Clean" ?=> "Build"
 "Clean" ?=> "BuildTests"
 "BuildTests" ?=> "Test"
-
-"Publish" <== [ "Pack"; "Test"; "BuildTests"; "Clean" ]
 
 Target.runOrDefault "Build"
