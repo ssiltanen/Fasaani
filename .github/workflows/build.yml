@@ -2,18 +2,18 @@ name: Fasaani .NET Core CI
 on:
   push:
     paths-ignore:
-      - '.vscode/**'
-      - '.editorconfig'
-      - '.gitignore'
-      - 'azuredeploysettings-template.json'
-      - 'build.fsx'
-      - 'build.fsx.lock'
-      - 'README.md'
-      - 'RELEASE_NOTES.md'
+    - '.vscode/**'
+    - '.editorconfig'
+    - '.gitignore'
+    - 'azuredeploysettings-template.json'
+    - 'build.fsx'
+    - 'build.fsx.lock'
+    - 'README.md'
+    - 'RELEASE_NOTES.md'
   pull_request:
   release:
     types:
-      - published
+    - published
 env:
   # General settings
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
