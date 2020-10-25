@@ -14,28 +14,33 @@ Download the assembly from Nuget [https://www.nuget.org/packages/Fasaani](https:
 open Fasaani
 ```
 
-## Overview of supported settings
+## Overview of supported query settings
 
 ```fsharp
 query {
-    searchText "text used to search"    // Text searched from index
-    searchFields [ "field" ]            // Which fields are matched with text search
-    searchMode All                      // Whether any or all of the search terms must be matched. All or Any
-    querySyntax Simple                  // Configure query to use simple syntax or Lucene syntax. Simple or Lucene
-    facets [ "field"; "field2" ]        // Facets to return, see facets
-    filter (where "field" Eq 1)         // Query filter, see filtering
-    skip 10                             // Skip count of results, see paging
-    top 25                              // How many results are returned, see paging
-    order [ byField "field2" Asc ]      // Order of returned results, see paging
-    includeTotalResultCount             // Return total matched results count, see paging
-    requestOptions opt                  // Raw request options of underlying SDK, see Help! section
-    //parameters par                    // Raw parameters of underlying SDK. Overwrites above other settings! See Help! section
+    searchText "text used to search"                // Text searched from index
+    searchFields [ "field" ]                        // Which fields are matched with text search
+    searchMode All                                  // Whether any or all of the search terms must be matched. All or Any
+    querySyntax Simple                              // Configure query to use simple syntax or Lucene syntax. Simple or Lucene
+    facets [ "field"; "field2" ]                    // Facets to return, see facets
+    filter (where "field" Eq 1)                     // Query filter, see filtering
+    skip 10                                         // Skip count of results, see paging
+    top 25                                          // How many results are returned, see paging
+    order [ byField "field2" Asc ]                  // Order of returned results, see paging
+    includeTotalResultCount                         // Return total matched results count, see paging
+    highlightFields [ "field1"; "field2" ]          // Fields to use for hit highlighting
+    highlightTags (Pre "&amp;") (Post "&amp//;")    // Tags to prepend and append highlight hits
+    minCoverage 90.                                 // Index search minimum coverage between 0 and 100
+    scoringProfile "profile1"                       // Name of profile to evaluate match score to sort results
+    scoringParameters [                             // Profile values to use in scoring functions
+        "profile1", Values [ "value1"; "value2" ]
+        "profile2", GeoPoint (Lat -122.2M, Lon 44.8M) 
+    ]
+    clientRequestId (Guid.NewGuid() |> Some)        // Request tracking id for debug purposes
 } |> searchAsync<'T> indexClient
 ```
 
 **All above settings are optional so use only the ones you need in your query.** More info of each can be found below. 
-
-The parameters setting is commented out in the example to emphasize that it **should not** be used together with other settings as **they overwrite each other** if used in the same query. This is supported to allow easy way to fall back to raw SDK, but using it is not recommended unless needed. 
 
 Extra mention also to Select parameter that sets the returned fields from result documents in the underlying library which is implicitly implemented in Fasaani from the output model properties.
 
@@ -193,6 +198,19 @@ query {
     includeTotalResultCount
 } |> searchAsync<'T> indexClient
 ```
+
+Skip value cannot be greater than 100 000. If you need to scan documents in sequence, but cannot use skip due to this limitation, consider using orderby on a totally-ordered key and $ilter with a range query instead.
+
+If results are truncated due to server-side paging, Azure Cognitive Search can't include all results in a single response, the response returned will include a continuation token that can be passed to ContinueSearch to retrieve more results. See DocumentSearchResult.ContinuationToken for more information. This continuation token can be found in the Raw results.
+
+Continuation token can be used with `continueSearchAsync` function:
+
+```fsharp
+let requestId = Guid.NewGuid() // Imagine here a value used in previous query
+continueSearchAsync<'T> indexClient (Some requestId) continuationToken
+```
+
+Note that this method is not meant to help you implement paging of search results. You can implement paging using the `top` and `skip`. 
 
 ### Facets
 

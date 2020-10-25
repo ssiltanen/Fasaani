@@ -13,6 +13,10 @@ type Coordinate = Lat * Lon
 // TODO: Create automatisation for the above
 type Polygon = Coordinate seq
 
+type ScoringParameterValue =
+    | GeoPoint of Coordinate
+    | Values of string seq
+
 type BinaryOperation =
     | And
     | Or
@@ -56,6 +60,9 @@ type QuerySyntax =
         | Simple -> QueryType.Simple
         | Lucene -> QueryType.Full
 
+type Pre = Pre of string
+type Post = Post of string
+
 type Filter =
     | Empty
     | Comparison of field:string * ComparisonOperation * value:obj
@@ -88,6 +95,9 @@ type QueryDetails =
             |> Option.map (Seq.map (fun sp -> printf "%s: %O" sp.Name (sp.Values |> flatten)))
             |> Option.toObj
 
+        // Parameters select values are not listed on default logger since they are added behind the scenes
+        // But using a custom logger it is possible to log them as they are added to query parameters before
+        // queryDefails are given to logger
         let details =
             [ "Filter",             box p.Filter
               "Search Text",        box (Option.toObj q.Text)
@@ -103,7 +113,8 @@ type QueryDetails =
               "Facets",             box (flatten p.Facets)
               "Skip",               box p.Skip
               "Top",                box p.Top
-              "Order By",           box (flatten p.OrderBy) ]
+              "Order By",           box (flatten p.OrderBy)
+              "clientRequestId",    box (q.RequestOptions |> Option.bind (fun opt -> opt.ClientRequestId |> Option.ofNullable)) ]
            |> List.where (snd >> unbox >> isNull >> not)
            |> function
            | [] -> ""
