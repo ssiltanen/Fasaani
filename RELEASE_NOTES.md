@@ -1,3 +1,9 @@
+### 1.3.0
+
+- Add the rest of the query parameters to query builder
+- Implement continueSearch operation
+- Improve function comments
+
 ### 1.2.2
 
 - Add static ToString method for QueryDetails to pretty print query details
