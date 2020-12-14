@@ -264,7 +264,7 @@ query {
 
 ### Special constants
 
-Fasaani maps F# float special values (`nan`, `infinity`, `-infinity`) to OData counterpars (NaN, INF, -INF)
+Fasaani maps F# float special values (`nan`, `infinity`, `-infinity`) to OData counterparts (NaN, INF, -INF)
 
 These can be used in filters for example:
 
@@ -387,24 +387,6 @@ index |> validateIndex |> Result.map (createOrUpdateIndexAsync client)
 Other possible settings for the Index CE include `analyzers`, `charFilters`, `cors`, `defaultScoringProfile`, `etag`, `scoringProfiles`, `suggesters`, `tokenFilters`, and `tokenizers`. They are operated the same way as the original library.
 
 Other possible settings for the Indexer CE include `description`, `etag`, `fieldMappings`, `disabled`, and `skillSet`.
-
-## Help! Fasaani does not support my use case
-
-To mitigate the small set of features in Fasaani, it is possible to overwrite search parameters, and search request options of the query with `parameters`, and `requestOptions` operators, while still using the Fasaani query syntax:
-
-```fsharp
-let customParameters = SearchParameters()
-customParameters.Top <- Nullable 100
-let customRequestOptions = SearchRequestOptions()
-
-query {
-    searchText "Search text"
-    parameters customParameters
-    requestOptions customRequestOptions
-} |> searchAsync<'T> indexClient
-```
-
-In addition, the raw `DocumentSearchResult<'T>` object from underlying method is also returned as `Raw` in the response body for access to values not offered by Fasaani.
 
 ## Contributions
 
