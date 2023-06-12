@@ -1,3 +1,5 @@
+Fasaani has been archived in favor of Azure.Search.Documents. The SDK Fasaani is built on top of is now considered legacy and deprecated in favor of the Azure.Search.Documents.
+
 # Fasaani
 
 <p align="center">
